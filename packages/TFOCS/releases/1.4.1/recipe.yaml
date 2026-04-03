@@ -1,0 +1,4 @@
+source:
+  git: "https://github.com/cvxr/TFOCS"
+  branch: "v1.4.1"
+  remove_dirs: [examples]

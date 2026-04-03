@@ -1,62 +1,61 @@
-% Example: Low-rank matrix completion using euclideanlargefactory (requires MEX)
+% Example: Low-rank matrix completion (requires MEX)
 %
 % Recovers a low-rank matrix from a subset of observed entries.
-% This uses euclideanlargefactory and sparseentries, which depend on
-% the compiled MEX functions spmaskmult and setsparseentries.
+% Uses sparseentries and replacesparseentries (MEX) via
+% euclideanlargefactory, following manopt's own approach.
 
 mip load --channel mip-org/staging manopt --install
 
-% Problem setup: recover a rank-r matrix of size m x n from partial entries
-m = 200;
-n = 150;
+% Problem setup
+m = 500;
+n = 500;
 r = 5;
 
-% Ground truth low-rank matrix
-L_true = randn(m, r);
-R_true = randn(n, r);
+Rmn = euclideanlargefactory(m, n);
 
-% Observe a random subset of entries (about 5*r*(m+n) entries)
-num_obs = min(5 * r * (m + n), m * n);
-idx = randperm(m * n, num_obs);
+% Sample entries: osf * r*(m+n-r) observations
+osf = 5;
+num_obs = round(osf * r * (m + n - r));
+idx = unique(randi(m * n, num_obs + 1000, 1));
+idx = idx(1:min(num_obs, numel(idx)));
 [I, J] = ind2sub([m, n], idx);
-mask = sparse(I, J, ones(num_obs, 1), m, n);
-observed = sparse(I, J, sum(L_true(I, :) .* R_true(J, :), 2), m, n);
+M = sparse(I, J, ones(numel(idx), 1), m, n);
 
-% Define the manifold: fixed-rank matrices of size m x n with rank r
-manifold = fixedrankembeddedfactory(m, n, r);
+% Ground truth rank-r matrix
+Astar.L = randn(m, r);
+Astar.R = randn(n, r);
+atrue = Rmn.sparseentries(M, Astar);  % sample entries via MEX
 
-% Set up the problem: minimize ||P_mask(L*R' - observed)||^2
-%
-% euclideanlargefactory is used internally by fixedrankembeddedfactory
-% to handle sparse inner products efficiently via MEX.
-problem.M = manifold;
-problem.cost = @cost;
-problem.egrad = @egrad;
+% Define problem over fixed-rank matrices
+problem.M = fixedrankembeddedfactory(m, n, r);
+problem.cost = @(X, store) cost_fn(X, store, Rmn, M, atrue);
+problem.egrad = @(X, store) egrad_fn(X, store, Rmn, M, atrue);
 
-    function f = cost(X)
-        LR_entries = sparseentries(mask, X.U * X.S, X.V);
-        residual = LR_entries - nonzeros(observed);
-        f = 0.5 * (residual' * residual);
-    end
-
-    function g = egrad(X)
-        LR_entries = sparseentries(mask, X.U * X.S, X.V);
-        residual = LR_entries - nonzeros(observed);
-        E = replacesparseentries(mask, residual);
-        g.U = E * (X.V * X.S');
-        g.S = X.U' * E * X.V;
-        g.V = E' * (X.U * X.S);
-    end
-
-% Solve
-options.maxiter = 200;
+options.maxtime = 10;
+options.tolgradnorm = 1e-8;
+options.tolcost = 1e-12;
 options.verbosity = 1;
-[X_opt, f_opt, info] = conjugategradient(problem, [], options);
 
-% Reconstruct and compare
-X_recovered = X_opt.U * X_opt.S * X_opt.V';
-X_true = L_true * R_true';
+[X_opt, xcost, info] = trustregions(problem, [], options);
 
-rel_error = norm(X_recovered - X_true, 'fro') / norm(X_true, 'fro');
+% Evaluate recovery
+X_true = Astar.L * Astar.R';
+X_rec = X_opt.U * X_opt.S * X_opt.V';
+rel_error = norm(X_rec - X_true, 'fro') / norm(X_true, 'fro');
 fprintf('\nRelative recovery error: %.2e\n', rel_error);
-fprintf('Final cost: %.2e\n', f_opt);
+fprintf('Final cost: %.2e\n', xcost);
+
+
+function [f, store] = cost_fn(X, store, Rmn, M, atrue)
+    if ~isfield(store, 'residue')
+        store.residue = Rmn.sparseentries(M, X) - atrue;
+    end
+    f = 0.5 * norm(store.residue)^2;
+end
+
+function [g, store] = egrad_fn(X, store, Rmn, M, atrue)
+    if ~isfield(store, 'residue')
+        store.residue = Rmn.sparseentries(M, X) - atrue;
+    end
+    g = replacesparseentries(M, store.residue);
+end
