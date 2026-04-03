@@ -1,0 +1,5 @@
+source:
+  git: "https://github.com/NicolasBoumal/manopt"
+  branch: "Release_8.0"
+  subdirectory: "manopt"
+  remove_dirs: [tests]

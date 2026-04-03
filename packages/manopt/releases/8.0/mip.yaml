@@ -1,0 +1,16 @@
+name: manopt
+description: "A MATLAB toolbox for optimization on manifolds."
+version: "8.0"
+license: "GPL-3.0"
+homepage: "https://www.manopt.org"
+repository: "https://github.com/NicolasBoumal/manopt"
+dependencies: []
+
+addpaths:
+  - path: "."
+    recursive: true
+
+builds:
+  - architectures: [linux_x86_64, macos_x86_64, macos_arm64]
+    compile_script: compile.m
+  - architectures: [any]
