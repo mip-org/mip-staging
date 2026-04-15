@@ -35,7 +35,7 @@ assert(isa(c, 'single') || isa(c, 'double'), ...
 %% --- MEX: spm_cat ------------------------------------------------------
 
 fprintf('Testing spm_cat...\n');
-M = spm_cat({eye(2), []; 0, [1 1; 1 1]});
+M = spm_cat({eye(2), zeros(2); zeros(2), [1 1; 1 1]});
 expected = [1 0 0 0; 0 1 0 0; 0 0 1 1; 0 0 1 1];
 assert(isequal(full(M), expected), 'spm_cat did not produce the expected block matrix');
 
