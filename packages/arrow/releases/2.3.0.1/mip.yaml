@@ -1,0 +1,14 @@
+name: arrow
+description: "Draw 2D/3D arrows on MATLAB axes with configurable head length, base/tip angles, and width."
+version: "2.3.0.1"
+license: "BSD-3-Clause"
+homepage: "https://www.mathworks.com/matlabcentral/fileexchange/278-arrow"
+repository: "https://www.mathworks.com/matlabcentral/fileexchange/278-arrow"
+dependencies: []
+
+addpaths:
+  - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_arrow.m
