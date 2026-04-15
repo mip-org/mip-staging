@@ -1,0 +1,3 @@
+source:
+  git: "https://github.com/alecjacobson/gptoolbox"
+  remove_dirs: [external/toolbox_fast_marching]
