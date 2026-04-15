@@ -1,0 +1,14 @@
+name: matlab_tree
+description: "A MATLAB class implementing a tree data structure."
+version: "master"
+license: "BSD-2-Clause"
+homepage: "https://github.com/tinevez/matlab-tree"
+repository: "https://github.com/tinevez/matlab-tree"
+dependencies: []
+
+addpaths:
+  - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_matlab_tree.m
