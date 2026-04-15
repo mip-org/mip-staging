@@ -493,10 +493,22 @@ See [manopt/example.m](packages/manopt/releases/8.0/example.m).
 
 ## Step 8 — Verify locally (optional but recommended)
 
-You can dry-run the prepare step from the channel root:
+The prepare script uses the `requests` Python module; install it once
+with `pip install requests` if it is not already on your system.
+
+To validate your `recipe.yaml` and `mip.yaml` without actually
+cloning/copying anything, run:
 
 ```bash
 python3 scripts/prepare_packages.py --package <package_name> --dry-run
+```
+
+A successful dry-run prints `[DRY RUN] Would prepare <name>` but does
+**not** produce the `build/prepared/` directory. To actually materialize
+the prepared tree so you can bundle it, drop the `--dry-run` flag:
+
+```bash
+python3 scripts/prepare_packages.py --package <package_name>
 ```
 
 Then, in MATLAB, point at the prepared directory and bundle:
