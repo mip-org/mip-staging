@@ -1,0 +1,14 @@
+name: functional_programming_constructs
+description: "Functional-programming helpers for MATLAB: iif, tern, map, curly, paren, loop, recur, and friends."
+version: "1.2.0.1"
+license: "LicenseRef-MathWorks"
+homepage: "https://www.mathworks.com/matlabcentral/fileexchange/39735-functional-programming-constructs"
+repository: "https://www.mathworks.com/matlabcentral/fileexchange/39735-functional-programming-constructs"
+dependencies: []
+
+addpaths:
+  - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_functional_programming_constructs.m

@@ -139,7 +139,56 @@ If a project does not have a public git repo, a direct ZIP URL works:
 ```yaml
 source:
   zip: "https://example.com/path/to/release.zip"
+  remove_dirs: [html, docs]   # optional — same semantics as the git form
 ```
+
+Both `zip` and `git` sources honor `remove_dirs:` (see
+[`_fetch_source`](scripts/prepare_packages.py#L241)). `subdirectory:`
+is **not** supported for zip sources — if the archive wraps all its
+content in a single top-level folder, use a tagged release/branch of
+the git form instead, or unpack and repackage.
+
+### MathWorks File Exchange
+
+File Exchange landing URLs like
+`https://www.mathworks.com/matlabcentral/fileexchange/39735-functional-programming-constructs`
+are not direct downloads. To derive the stable, versioned zip URL:
+
+```bash
+curl -sIL "https://www.mathworks.com/matlabcentral/fileexchange/<id>-<slug>?download=true" \
+  | grep -i '^location:' | tail -1
+```
+
+The last `location:` header is of the form
+`.../submissions/<id>/versions/<N>/download/zip/<name>.zip?...`. Strip
+the query string and keep the path — that's what goes in `zip:`:
+
+```yaml
+source:
+  zip: "https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/39735/versions/4/download/zip"
+  remove_dirs: [html]   # most FEX entries ship pre-rendered html/ demos
+```
+
+Two things to watch for:
+
+1. **`<N>` is the FEX internal version counter, not the package's
+   human-facing version.** A FEX page often shows a separate version
+   string set by the author (e.g. `1.2.0.1` for FEX #39735 at
+   counter 4). MathWorks blocks most scrapers (WebFetch returns 403),
+   so **ask the human user what version string to put in `mip.yaml`
+   and the release directory name**. The FEX counter is only used in
+   the URL.
+
+2. **Layout is usually flat** — `.m` files sit at the zip root, so no
+   `subdirectory:` is needed. Verify by listing the zip:
+   `curl -sL "<zip-url>" -o /tmp/fex.zip && unzip -l /tmp/fex.zip`.
+
+Most FEX packages authored by The MathWorks ship under the
+BSD-3-Clause variant restricted to "MathWorks products and service
+offerings" — use `license: "LicenseRef-MathWorks"` and note the
+restriction in `README.md` (Step 7). See
+[functional_programming_constructs recipe.yaml](packages/functional_programming_constructs/releases/1.2.0.1/recipe.yaml)
+for a real example.
 
 ### Notes
 
@@ -148,8 +197,9 @@ source:
 - `subdirectory:` is useful when a repo contains the MATLAB code under a
   nested folder (e.g. `manopt/` inside the `manopt` repo — see
   [manopt recipe.yaml](packages/manopt/releases/8.0/recipe.yaml)).
+  Only supported with `git:` sources.
 - `remove_dirs:` is useful for trimming large test/demo folders that
-  bloat the bundle.
+  bloat the bundle. Works with both `git:` and `zip:` sources.
 - The `.git/` directory is automatically removed after clone.
 
 ---
@@ -594,6 +644,35 @@ mip.bundle('build/prepared/<package_name>-<version>')
 
 If the bundle succeeds and produces a `.mhl` plus `.mhl.mip.json` in
 `build/bundled/`, the package is ready to push.
+
+### End-to-end test via editable install
+
+Bundling catches packaging-layer problems; it does not execute the
+package's `test_script`. To exercise the full user-facing flow
+(`install → load → test`) against the prepared tree, use `mip`'s
+editable-install mode. From any directory:
+
+```bash
+matlab -batch "mip('install', '-e', '/abs/path/to/mip-staging/build/prepared/<package_name>-<version>'); mip('test', '<package_name>')"
+```
+
+`-e` installs a thin wrapper at `local/local/<package_name>` that
+points at the prepared directory — no `.mhl` build, no GitHub roundtrip.
+`mip test` loads the package and runs the `test_script` from the
+matching build entry. A successful run ends with the test script's
+`SUCCESS` print followed by MATLAB's clean exit.
+
+When finished, tear down the editable install so the next run starts
+clean:
+
+```bash
+matlab -batch "mip('uninstall', '<package_name>')"
+rm -rf build/
+```
+
+This workflow is the fastest way to catch issues the CI runner would
+catch later (missing functions, wrong `addpaths`, broken
+`test_<package_name>.m`) before you push.
 
 ---
 
