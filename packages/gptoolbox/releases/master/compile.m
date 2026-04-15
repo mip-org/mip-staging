@@ -22,7 +22,7 @@ fprintf('=== Compiling gptoolbox MEX files ===\n');
 if isunix && ~ismac
     origLdPath = getenv('LD_LIBRARY_PATH');
     setenv('LD_LIBRARY_PATH', '');
-    restoreLdPath = onCleanup(@() setenv('LD_LIBRARY_PATH', origLdPath)); %#ok<NASGU>
+    restoreLdPath = onCleanup(@() setenv('LD_LIBRARY_PATH', origLdPath));
 end
 
 srcRoot = pwd;
@@ -36,6 +36,36 @@ end
 if ~exist(buildDir, 'dir')
     mkdir(buildDir);
 end
+
+% Patch mex/CMakeLists.txt to drop the no-CGAL build of triangulate.cpp.
+% Upstream triangulate.cpp #includes CGAL headers unconditionally (only
+% the switch-case bodies are #ifdef WITH_CGAL guarded), so it cannot
+% compile when LIBIGL_COPYLEFT_CGAL=OFF. refine_triangulation.cpp, built
+% from the same LIBIGL_RESTRICTED_TRIANGLE block, has no CGAL deps and
+% continues to build.
+cmakelistsPath = fullfile(mexDir, 'CMakeLists.txt');
+fid = fopen(cmakelistsPath, 'r');
+content = fread(fid, '*char')';
+fclose(fid);
+
+oldBlock = [ ...
+    '  else()' newline ...
+    '    compile_each("\' newline ...
+    'triangulate.cpp;\' newline ...
+    '"' newline ...
+    '    "${CORE_LIBS};igl::core;igl_restricted::matlab;igl_restricted::triangle")' newline ...
+    '  endif()'];
+newBlock = '  endif()';
+if ~contains(content, oldBlock)
+    error(['Could not locate the expected triangulate.cpp else-branch ' ...
+           'in mex/CMakeLists.txt. Upstream layout may have changed — ' ...
+           'update the patch in compile.m.']);
+end
+content = strrep(content, oldBlock, newBlock);
+fid = fopen(cmakelistsPath, 'w');
+fwrite(fid, content);
+fclose(fid);
+fprintf('Patched mex/CMakeLists.txt to skip triangulate.cpp.\n');
 
 cmakeArgs = { ...
     sprintf('cmake "%s" -B "%s"', mexDir, buildDir), ...

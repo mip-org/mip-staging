@@ -29,7 +29,9 @@ To keep the build tractable in CI, the following libigl options are **disabled**
 - `WITH_ELTOPO` — drops `eltopo`
 - `LIBIGL_XML` — disabled in conjunction with CGAL (the only file using it, `read_mesh_from_xml`, also needs CGAL)
 
-The remaining ~31 MEX files — libigl-core, `igl::predicates`, `igl_copyleft::tetgen`, `igl_restricted::triangle`, and `igl::cycodebase` backed — are built and shipped. This includes `aabb`, `exact_geodesic`, `signed_distance`, `slim`, `decimate_libigl`, `icp`, `readMSH`, `read_triangle_mesh`, `solid_angle`, `winding_number`, `tetrahedralize`, `triangulate`, `refine_triangulation`, `orient2d`, `orient3d`, `fast_roots`, `fast_sparse`, and others.
+`triangulate` is also dropped: upstream's `triangulate.cpp` `#include`s `<CGAL/...>` headers unconditionally (only the switch-case bodies are `#ifdef WITH_CGAL`-guarded), so it cannot compile with `LIBIGL_COPYLEFT_CGAL=OFF`. Our `compile.m` patches `mex/CMakeLists.txt` at build time to skip its no-CGAL build. The sibling `refine_triangulation` builds fine and is shipped.
+
+The remaining MEX files — libigl-core, `igl::predicates`, `igl_copyleft::tetgen`, `igl_restricted::triangle` (just `refine_triangulation`), and `igl::cycodebase` backed — are built and shipped. This includes `aabb`, `exact_geodesic`, `signed_distance`, `slim`, `decimate_libigl`, `icp`, `readMSH`, `read_triangle_mesh`, `solid_angle`, `winding_number`, `tetrahedralize`, `refine_triangulation`, `orient2d`, `orient3d`, `fast_roots`, `fast_sparse`, and others.
 
 ### Disabled MEX functions
 
