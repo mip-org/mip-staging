@@ -1,0 +1,14 @@
+name: gridfit
+description: "Estimate a smooth surface on a 2D grid from scattered (x,y,z) data using a ridge-regularized least-squares fit."
+version: "1.1.0.0"
+license: "BSD-2-Clause"
+homepage: "https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit"
+repository: "https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit"
+dependencies: []
+
+addpaths:
+  - path: "gridfitdir"
+
+builds:
+  - architectures: [any]
+    test_script: test_gridfit.m

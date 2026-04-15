@@ -1,0 +1,5 @@
+source:
+  zip: "https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/8998/versions/4/download/zip"
+  remove_dirs:
+    - gridfitdir/demo
+    - gridfitdir/doc
