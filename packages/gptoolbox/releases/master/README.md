@@ -43,7 +43,9 @@ The built MEX files are statically linked against libstdc++/libgcc on Linux and 
 
 ### Architectures
 
-Pre-compiled MEX binaries are produced for `linux_x86_64`, `macos_x86_64`, `macos_arm64`, and `windows_x86_64`. On any other architecture, only the pure-MATLAB portions of gptoolbox are available.
+Pre-compiled MEX binaries are produced for `linux_x86_64`, `macos_x86_64`, and `macos_arm64`. Windows and any other architecture get the pure-MATLAB fallback build — the upstream sources are shipped and added to the path, but calling any `mex/*` function fails with a missing-MEX error.
+
+**Why no Windows MEX?** git's `core.autocrlf` converts line endings when cloning on Windows runners, so `mex/CMakeLists.txt` arrives with CRLF line endings. Our `compile.m` patches that file by matching a multi-line block with LF newlines — the match fails under CRLF and the build errors out before cmake is even invoked. Rather than thread CRLF-tolerant patching into `compile.m`, we skip the Windows MEX build for now; if Windows MEX is needed later, a proper fix is to normalize the file to LF before applying the patch (or to use a line-ending-agnostic regex).
 
 ### Tests
 
