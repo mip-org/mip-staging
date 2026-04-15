@@ -372,6 +372,24 @@ longer available in the package's `README.md` (see Step 7).
   error, which is what you want.
 - When shelling out to CMake/Make, pass `-j$(maxNumCompThreads)` so the
   runner's cores are actually used.
+- **Clear `LD_LIBRARY_PATH` before `system()` calls on Linux.** MATLAB
+  injects its own `libcurl.so.4` / `libssl` into `LD_LIBRARY_PATH`, and
+  they are older/ABI-incompatible with what system tools expect. A
+  subprocess `curl` (e.g. the one vcpkg uses to bootstrap itself) dies
+  with `symbol lookup error: undefined symbol: curl_global_trace`. At
+  the top of `compile.m`:
+
+  ```matlab
+  if isunix && ~ismac
+      origLdPath = getenv('LD_LIBRARY_PATH');
+      setenv('LD_LIBRARY_PATH', '');
+      restoreLdPath = onCleanup(@() setenv('LD_LIBRARY_PATH', origLdPath));
+  end
+  ```
+
+  `onCleanup` restores the path when the caller (`run_compile`) exits.
+  CMake/GCC don't need MATLAB on `LD_LIBRARY_PATH` at compile/link
+  time — `Matlab_ROOT_DIR` is enough.
 
 ---
 

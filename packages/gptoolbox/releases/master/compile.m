@@ -14,6 +14,17 @@
 
 fprintf('=== Compiling gptoolbox MEX files ===\n');
 
+% MATLAB on Linux injects its own libcurl/libssl into LD_LIBRARY_PATH,
+% which breaks the system `curl` that vcpkg bootstrap invokes:
+%   curl: symbol lookup error: undefined symbol: curl_global_trace
+% Clear LD_LIBRARY_PATH for the duration of this script so subprocesses
+% use the system libraries; onCleanup restores it on exit.
+if isunix && ~ismac
+    origLdPath = getenv('LD_LIBRARY_PATH');
+    setenv('LD_LIBRARY_PATH', '');
+    restoreLdPath = onCleanup(@() setenv('LD_LIBRARY_PATH', origLdPath)); %#ok<NASGU>
+end
+
 srcRoot = pwd;
 mexDir = fullfile(srcRoot, 'mex');
 buildDir = fullfile(mexDir, 'build');
