@@ -372,16 +372,61 @@ longer available in the package's `README.md` (see Step 7).
   error, which is what you want.
 - When shelling out to CMake/Make, pass `-j$(maxNumCompThreads)` so the
   runner's cores are actually used.
-- **Pass `-DCMAKE_SKIP_BUILD_RPATH=TRUE` to CMake-driven MEX builds.**
-  CMake's default is to bake the link-time library directories into
-  the build-tree `RPATH`, which hardcodes the CI runner's MATLAB
-  install path (e.g. `/opt/hostedtoolcache/MATLAB/.../bin/glnxa64`)
-  into the `.mexa64` / `.mexmaci64`. End-user machines don't have that
-  path, so `mip test` fails with `libmex.so: cannot open shared object
-  file`. Skipping the build RPATH leaves no RPATH on the binary, so
-  the loader uses `LD_LIBRARY_PATH` (which MATLAB sets to its own
-  `bin/<arch>` directory) and finds the running MATLAB's `libmex.so`
-  automatically.
+
+### Linux CMake+MATLAB MEX: patch `DT_NEEDED` after build
+
+When a CMake build (via libigl-style `target_link_libraries(...
+${Matlab_LIBRARIES})`) links a MEX file against MATLAB's own shared
+libraries, the `.mexa64` ends up with **absolute paths to the CI
+runner's MATLAB install baked into `DT_NEEDED`**:
+
+```
+$ readelf -d fast_sparse.mexa64 | grep NEEDED
+ (NEEDED)  [/opt/hostedtoolcache/MATLAB/2022.1.999/x64/bin/glnxa64/libmex.so]
+ (NEEDED)  [/opt/hostedtoolcache/MATLAB/2022.1.999/x64/bin/glnxa64/libmx.so]
+ (NEEDED)  [/opt/hostedtoolcache/MATLAB/2022.1.999/x64/extern/bin/glnxa64/libMatlabEngine.so]
+```
+
+This happens because MATLAB's `libmex.so` / `libmx.so` /
+`libMatlabEngine.so` ship without a `DT_SONAME`. When `ld` is given a
+shared library by absolute path **and** that library has no
+`SONAME`, it copies the absolute path verbatim into `DT_NEEDED`
+instead of the basename. On any end-user machine that absolute path
+doesn't exist and `mip test` fails with
+`libmex.so: cannot open shared object file`. `CMAKE_SKIP_BUILD_RPATH`
+does **not** help — the problem is in `NEEDED`, not `RPATH`.
+
+The fix is a post-build `patchelf` pass in `compile.m`:
+
+1. For each absolute `NEEDED` entry, rewrite it to its basename
+   (`patchelf --replace-needed /abs/path/libmex.so libmex.so <file>`).
+   The loader then resolves `libmex.so` against MATLAB's own
+   `LD_LIBRARY_PATH` at dlopen time, which always points to the
+   running MATLAB's `bin/glnxa64/`.
+
+2. **Drop `libMatlabEngine.so` entirely**
+   (`patchelf --remove-needed libMatlabEngine.so <file>`). It lives
+   under `<matlabroot>/extern/bin/glnxa64/` — a directory MATLAB does
+   **not** add to `LD_LIBRARY_PATH` at runtime, so even the basename
+   won't resolve. But CMake's `Matlab_LIBRARIES` list pulls it in as
+   a link-time dep regardless of whether the MEX actually calls any
+   Engine symbols. Verify with
+   `nm --undefined-only --dynamic <file> | grep -i matlab::` — if
+   nothing comes back (the typical case for classic `mx*`/`mex*`-API
+   code), the NEEDED entry is a phantom and removing it is safe.
+
+`patchelf` is not pre-installed on GitHub's `ubuntu-latest` runner.
+Install it in the workflow alongside the compiler setup step, not in
+`compile.m` — software installation is an infra concern:
+
+```yaml
+- name: Install toolchain
+  run: sudo apt install -y gcc-10 g++-10 patchelf
+```
+
+See [gptoolbox/compile.m](packages/gptoolbox/releases/master/compile.m)
+for a full `patchelf` post-build block that iterates every
+`mex/*.mexa64` and applies both fixes.
 - **Clear `LD_LIBRARY_PATH` before `system()` calls on Linux.** MATLAB
   injects its own `libcurl.so.4` / `libssl` into `LD_LIBRARY_PATH`, and
   they are older/ABI-incompatible with what system tools expect. A

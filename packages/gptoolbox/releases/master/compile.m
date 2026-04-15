@@ -74,8 +74,7 @@ cmakeArgs = { ...
     ' -DLIBIGL_COPYLEFT_CGAL=OFF', ...
     ' -DLIBIGL_EMBREE=OFF', ...
     ' -DWITH_ELTOPO=OFF', ...
-    ' -DLIBIGL_XML=OFF', ...
-    ' -DCMAKE_SKIP_BUILD_RPATH=TRUE'};
+    ' -DLIBIGL_XML=OFF'};
 
 if isunix && ~ismac
     cmakeArgs{end+1} = ' -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++ -static-libgcc"';
@@ -109,6 +108,59 @@ fprintf('Building: %s\n', buildCmd);
 fprintf('%s', output);
 if status ~= 0
     error('CMake build failed (exit code %d)', status);
+end
+
+% Fix up Linux .mexa64 DT_NEEDED entries so they load on end-user machines:
+%
+%   1. MATLAB's libmex.so / libmx.so / libMatlabEngine.so have no DT_SONAME,
+%      so `ld` embeds the full absolute path it was given into DT_NEEDED.
+%      That bakes the CI runner's MATLAB install path into every .mexa64
+%      and breaks loading on any other machine. Rewrite each absolute
+%      NEEDED entry to its basename so the loader resolves it via MATLAB's
+%      own LD_LIBRARY_PATH at dlopen time.
+%
+%   2. libMatlabEngine.so (modern C++ MEX API) lives under
+%      <matlabroot>/extern/bin/glnxa64/, which is NOT on MATLAB's runtime
+%      LD_LIBRARY_PATH — so even the basename won't resolve. Fortunately
+%      gptoolbox's MEX files don't use any Engine symbols (verified via
+%      `nm --undefined-only`); the linker pulled it in just because CMake
+%      listed it in Matlab_LIBRARIES. Drop the NEEDED entry entirely.
+%
+% patchelf must be available on PATH; the GitHub Actions workflow installs
+% it via apt. See adding_a_package.md for the general pattern.
+if isunix && ~ismac
+    [status, ~] = system('command -v patchelf >/dev/null 2>&1');
+    if status ~= 0
+        error(['patchelf not found on PATH. Install it in the workflow ' ...
+               '(`sudo apt install -y patchelf`) before running the MEX bundle step.']);
+    end
+
+    fprintf('Rewriting absolute NEEDED entries to basenames...\n');
+    mexFiles = dir(fullfile(mexDir, '*.mexa64'));
+    for ii = 1:numel(mexFiles)
+        f = fullfile(mexFiles(ii).folder, mexFiles(ii).name);
+        [~, dump] = system(sprintf('readelf -d "%s"', f));
+        needed = regexp(dump, 'NEEDED\)\s*Shared library: \[([^\]]+)\]', 'tokens');
+        for jj = 1:numel(needed)
+            dep = needed{jj}{1};
+            if startsWith(dep, '/')
+                [~, n, ext] = fileparts(dep);
+                base = [n ext];
+                [status, out] = system(sprintf( ...
+                    'patchelf --replace-needed "%s" "%s" "%s"', dep, base, f));
+                if status ~= 0
+                    error('patchelf --replace-needed failed on %s: %s', ...
+                          mexFiles(ii).name, out);
+                end
+            end
+        end
+        [status, out] = system(sprintf( ...
+            'patchelf --remove-needed libMatlabEngine.so "%s"', f));
+        if status ~= 0
+            error('patchelf --remove-needed failed on %s: %s', ...
+                  mexFiles(ii).name, out);
+        end
+    end
 end
 
 fprintf('=== gptoolbox MEX compilation complete ===\n');
