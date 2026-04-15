@@ -1,4 +1,4 @@
-% Test script for matGeom package.
+% Test script for matgeom package.
 
 rng('default');
 

@@ -1,4 +1,4 @@
-# TFOCS
+# tfocs
 
 [TFOCS](http://cvxr.com/tfocs/) (Templates for First-Order Conic Solvers, pronounced "tee-fox") is a MATLAB library for solving convex optimization problems via first-order methods. It provides building blocks (smooth functions, proximity operators, projections, linear operators) for constructing efficient solvers.
 
@@ -10,8 +10,8 @@
 ## Install
 
 ```matlab
-mip install --channel mip-org/staging TFOCS
-mip load TFOCS
+mip install --channel mip-org/staging tfocs
+mip load tfocs
 ```
 
 ## Features

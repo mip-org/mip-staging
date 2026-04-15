@@ -3,7 +3,7 @@
 % Finds x minimizing  0.5*||A*x - b||^2 + lambda*||x||_1
 % This is a standard sparse recovery / compressed sensing problem.
 
-mip load --channel mip-org/staging TFOCS --install
+mip load --channel mip-org/staging tfocs --install
 
 % Problem setup
 n = 200;   % signal dimension

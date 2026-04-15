@@ -75,9 +75,14 @@ Things to determine:
 6. **Package name normalization.** The directory name under `packages/`
    must use **underscores instead of hyphens** (the bundling pipeline
    rejects hyphens — see
-   [scripts/prepare_packages.py:257](scripts/prepare_packages.py#L257)).
-   Convert `my-cool-pkg` → `my_cool_pkg`. The `name:` field in `mip.yaml`
-   must match this directory name exactly.
+   [scripts/prepare_packages.py:257](scripts/prepare_packages.py#L257))
+   and must be **all lowercase**. Convert `My-Cool-Pkg` → `my_cool_pkg`,
+   `TFOCS` → `tfocs`, `matGeom` → `matgeom`. The `name:` field in
+   `mip.yaml` must match this directory name exactly. The upstream
+   project's trademark/display name (e.g. "TFOCS", "MatGeom") may still
+   appear in prose, URLs, and `subdirectory:` entries that point at
+   upstream directory layout — only the mip package identifier is
+   lowercased.
 
 7. **Existing `mip.yaml`.** If the upstream repository already ships a
    valid `mip.yaml` at its root (or at the path that becomes the package
@@ -309,7 +314,7 @@ fprintf('=== my_package MEX compilation complete ===\n');
 ### Patterns from existing packages
 
 - Simple single-file MEX —
-  [TFOCS/compile.m](packages/TFOCS/releases/1.4.1/compile.m).
+  [tfocs/compile.m](packages/tfocs/releases/1.4.1/compile.m).
 - Many MEX files with BLAS/LAPACK linking —
   [manopt/compile.m](packages/manopt/releases/8.0/compile.m).
 - Glob a directory and compile every `.cpp` with C++14 flags —

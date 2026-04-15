@@ -1,4 +1,4 @@
-name: TFOCS
+name: tfocs
 description: "Templates for First-Order Conic Solvers — convex optimization via first-order methods."
 version: "1.4.1"
 license: "BSD-3-Clause"

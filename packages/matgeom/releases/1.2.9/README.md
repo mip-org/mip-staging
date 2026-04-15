@@ -1,4 +1,4 @@
-# matGeom
+# matgeom
 
 [MatGeom](https://github.com/mattools/matGeom) is a MATLAB library for geometry processing and geometric computing in 2D and 3D. It provides several hundred functions for creating, manipulating, and displaying geometric primitives: points, lines, circles, ellipses, polygons, polyhedra, and 3D polygonal meshes.
 
@@ -10,8 +10,8 @@
 ## Install
 
 ```matlab
-mip install --channel mip-org/staging matGeom
-mip load matGeom
+mip install --channel mip-org/staging matgeom
+mip load matgeom
 ```
 
 ## What is shipped
@@ -35,4 +35,4 @@ The upstream repository also contains a top-level `tests/`, `demos/`, `docs/`, a
 
 ## Tests
 
-`test_matGeom.m` exercises a cross-section of the library — 2D polygon area, circle-to-polygon conversion, line/point distance, bounding boxes, 3D plane construction, and mesh volume/surface area on a unit cube — to confirm the modules load and the core numerics behave.
+`test_matgeom.m` exercises a cross-section of the library — 2D polygon area, circle-to-polygon conversion, line/point distance, bounding boxes, 3D plane construction, and mesh volume/surface area on a unit cube — to confirm the modules load and the core numerics behave.
