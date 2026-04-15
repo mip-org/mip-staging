@@ -34,6 +34,14 @@ Things to determine:
    permissive but lacks an SPDX file, use `unspecified` (see
    [kdtree](packages/../../mip-core/packages/kdtree/releases/master/mip.yaml)).
 
+   **MathWorks File Exchange license.** Packages authored by The MathWorks
+   typically ship a BSD-3-Clause variant whose third clause limits the
+   end-user grant to "MathWorks products and service offerings" (e.g.
+   [dotenv](packages/dotenv/releases/1.1.4/mip.yaml)). Redistribution is
+   permitted, so the channel may carry these. Set
+   `license: "LicenseRef-MathWorks"` and note the use restriction in the
+   package `README.md` (Step 7).
+
 2. **Security review.** Skim the source for anything that would make
    distribution inappropriate: hard-coded credentials, unsanitized `eval` of
    untrusted input, network calls to suspicious endpoints, large pre-built
