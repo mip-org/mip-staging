@@ -372,6 +372,16 @@ longer available in the package's `README.md` (see Step 7).
   error, which is what you want.
 - When shelling out to CMake/Make, pass `-j$(maxNumCompThreads)` so the
   runner's cores are actually used.
+- **Pass `-DCMAKE_SKIP_BUILD_RPATH=TRUE` to CMake-driven MEX builds.**
+  CMake's default is to bake the link-time library directories into
+  the build-tree `RPATH`, which hardcodes the CI runner's MATLAB
+  install path (e.g. `/opt/hostedtoolcache/MATLAB/.../bin/glnxa64`)
+  into the `.mexa64` / `.mexmaci64`. End-user machines don't have that
+  path, so `mip test` fails with `libmex.so: cannot open shared object
+  file`. Skipping the build RPATH leaves no RPATH on the binary, so
+  the loader uses `LD_LIBRARY_PATH` (which MATLAB sets to its own
+  `bin/<arch>` directory) and finds the running MATLAB's `libmex.so`
+  automatically.
 - **Clear `LD_LIBRARY_PATH` before `system()` calls on Linux.** MATLAB
   injects its own `libcurl.so.4` / `libssl` into `LD_LIBRARY_PATH`, and
   they are older/ABI-incompatible with what system tools expect. A
