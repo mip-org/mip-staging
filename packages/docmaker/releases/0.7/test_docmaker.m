@@ -17,11 +17,14 @@ assert(exist('docdelete', 'file') == 2, ...
     'docdelete is not on the MATLAB path');
 
 fprintf('Testing +docmaker namespace...\n');
-assert(exist('docmaker.converter', 'file') == 2, ...
-    'docmaker.converter is not reachable via the +docmaker namespace');
+pkgRoot = fileparts(which('docconvert'));
+nsDir = fullfile(pkgRoot, '+docmaker');
+assert(isfolder(nsDir), ...
+    sprintf('Expected +docmaker namespace directory at %s', nsDir));
+assert(isfile(fullfile(nsDir, 'converter.m')), ...
+    'docmaker.converter.m is missing from the +docmaker namespace');
 
 fprintf('Testing bundled resources...\n');
-pkgRoot = fileparts(which('docconvert'));
 resourcesDir = fullfile(pkgRoot, 'resources');
 assert(isfolder(resourcesDir), ...
     sprintf('Expected resources directory at %s', resourcesDir));

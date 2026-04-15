@@ -423,6 +423,13 @@ See [chunkie/test_chunkie.m](../mip-core/packages/chunkie/releases/master/test_c
 and [kdtree/test_kdtree.m](../mip-core/packages/kdtree/releases/master/test_kdtree.m)
 for fuller examples.
 
+> **Note on `+namespace` functions.** `exist('pkg.fcn', 'file')` returns
+> `0` for functions inside a `+pkg` folder in many MATLAB versions — it
+> only matches loose `.m` files on the path. To assert that a namespaced
+> function ships, check the file on disk (e.g.
+> `isfile(fullfile(pkgRoot, '+pkg', 'fcn.m'))`) or use
+> `~isempty(which('pkg.fcn'))`.
+
 ### Two test scripts when you have a MEX build + `[any]` fallback
 
 If `mip.yaml` has both an architecture-specific MEX build and an
@@ -522,12 +529,18 @@ If the bundle succeeds and produces a `.mhl` plus `.mhl.mip.json` in
 
 ---
 
-## Step 9 — Commit and push
+## Step 9 — Hand off for commit and push
 
-Commit the new files under `packages/<package_name>/releases/<version>/`
-and push to `main`. The CI workflow will prepare, bundle (running
-`compile.m` on each target architecture), upload `.mhl` files as Release
-assets, and refresh the channel index.
+When you (the assistant working on this channel) are done writing the
+new files under `packages/<package_name>/releases/<version>/`, **stop
+there**. Do **not** run `git add`, `git commit`, or `git push` on the
+user's behalf unless they explicitly ask for it in the current turn.
+
+Summarize what you changed, point at the files, and let the user
+inspect and commit themselves. They will push to `main` when they're
+ready. Once they do, the CI workflow will prepare, bundle (running
+`compile.m` on each target architecture), upload `.mhl` files as
+Release assets, and refresh the channel index.
 
 After the workflow completes, users can install with:
 
