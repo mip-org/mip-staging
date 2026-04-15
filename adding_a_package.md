@@ -346,6 +346,7 @@ provide it. The script:
 - Should not depend on anything outside the package directory other than
   a working `mex` toolchain (and any system tools like `cmake` if the
   package needs them).
+- Should compile for a generic machine of the specified platform. Flags like `-march=native` or other CPU-specific optimizations should not be used during compilation.
 
 ### Minimal MEX example
 
