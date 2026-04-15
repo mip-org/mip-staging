@@ -1,0 +1,14 @@
+name: hline_and_vline
+description: "Draw horizontal and vertical reference lines on MATLAB axes, with optional labels and vectorized inputs."
+version: "1.0.0.0"
+license: "BSD-2-Clause"
+homepage: "https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-vline"
+repository: "https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-vline"
+dependencies: []
+
+addpaths:
+  - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_hline_and_vline.m
