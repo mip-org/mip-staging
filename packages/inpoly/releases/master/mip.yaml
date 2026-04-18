@@ -1,0 +1,14 @@
+name: inpoly
+description: "Fast point(s)-in-polygon queries via crossing-number test with binary-search acceleration."
+version: "master"
+license: "LicenseRef-Inpoly"
+homepage: "https://github.com/dengwirda/inpoly"
+repository: "https://github.com/dengwirda/inpoly"
+dependencies: []
+
+addpaths:
+  - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_inpoly.m
