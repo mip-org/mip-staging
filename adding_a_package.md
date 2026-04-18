@@ -42,6 +42,22 @@ Things to determine:
    `license: "LicenseRef-MathWorks"` and note the use restriction in the
    package `README.md` (Step 7).
 
+   **Custom / non-standard licenses.** Some projects ship a bespoke license
+   that permits redistribution but adds conditions (non-commercial use,
+   attribution requirements, research-only grants, etc.) and therefore
+   doesn't map to any SPDX standard identifier. Confirm the terms actually
+   allow redistribution — if they do, set
+   `license: "LicenseRef-<PackageName>"` (e.g. `LicenseRef-Inpoly` for the
+   [inpoly](packages/inpoly/releases/master/mip.yaml) custom non-commercial
+   license). The `LicenseRef-` prefix is SPDX's escape hatch for
+   user-defined identifiers, and using a per-package suffix — rather than a
+   generic `LicenseRef-Custom` — keeps distinct license families
+   distinguishable to tooling and auditors. Spell out the restriction in
+   the package `README.md` (Step 7) so end users aren't surprised by terms
+   the SPDX tag alone can't convey. Do **not** use `unspecified` for this
+   case — that identifier is reserved for projects that are intentionally
+   permissive but simply lack a formal SPDX file.
+
 2. **Security review.** Skim the source for anything that would make
    distribution inappropriate: hard-coded credentials, unsanitized `eval` of
    untrusted input, network calls to suspicious endpoints, large pre-built
