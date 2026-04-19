@@ -88,17 +88,35 @@ Things to determine:
    MEX builds work on `linux_x86_64`, `macos_x86_64`, `macos_arm64`, and
    `windows_x86_64`, but Fortran or CUDA may be more restrictive.
 
-6. **Package name normalization.** The directory name under `packages/`
-   must use **underscores instead of hyphens** (the bundling pipeline
-   rejects hyphens — see
-   [scripts/prepare_packages.py:257](scripts/prepare_packages.py#L257))
-   and must be **all lowercase**. Convert `My-Cool-Pkg` → `my_cool_pkg`,
-   `TFOCS` → `tfocs`, `matGeom` → `matgeom`. The `name:` field in
-   `mip.yaml` must match this directory name exactly. The upstream
+6. **Package name normalization.** Pick a single **canonical** name
+   and use it identically in four places: the directory name under
+   `packages/`, the `name:` field in `mip.yaml`, the `name` field in the
+   generated `.mip.json` metadata, and the channel index. Rules:
+
+   - **Must be all lowercase.** The bundling pipeline rejects
+     non-lowercase names (see
+     [scripts/prepare_packages.py:265](scripts/prepare_packages.py#L265)).
+     `TFOCS` → `tfocs`, `matGeom` → `matgeom`.
+   - **`-` and `_` are both allowed.** Match the upstream spelling when
+     there's an obvious one — `dengwirda/aabb-tree` → `aabb-tree`,
+     `matlab_progressbar` → `matlab_progressbar`. Don't mechanically
+     convert between them.
+
+   The `mip` CLI normalizes user input (lowercase, `-`↔`_`) when
+   resolving a typed name to a canonical name, so users can type
+   `AABB_Tree` and it still resolves to `aabb-tree`. The upstream
    project's trademark/display name (e.g. "TFOCS", "MatGeom") may still
    appear in prose, URLs, and `subdirectory:` entries that point at
    upstream directory layout — only the mip package identifier is
    lowercased.
+
+   **Filename encoding.** `.mhl` / `.mhl.mip.json` files and GitHub
+   release tags follow the scheme `<name>-<version>-<arch>.mhl` and use
+   `-` as a field separator, so **in filenames only**, `-` in the
+   canonical name is encoded as `_` (e.g. canonical `aabb-tree`
+   produces `aabb_tree-master-any.mhl`). The bundler handles this
+   automatically — you don't need to do anything, but don't be
+   surprised when the filename looks different from the canonical name.
 
 7. **Existing `mip.yaml`.** If the upstream repository already ships a
    valid `mip.yaml` at its root (or at the path that becomes the package
@@ -278,7 +296,7 @@ addpaths:
 at least one `.m` file. Directories starting with `.`, `+` (MATLAB
 namespaces), or `@` (MATLAB classes) are automatically excluded — MATLAB
 discovers those without an explicit `addpath`. See
-[FLAM mip.yaml](../mip-core/packages/FLAM/releases/master/mip.yaml) for a
+[flam mip.yaml](../mip-core/packages/flam/releases/master/mip.yaml) for a
 recursive example.
 
 ### `builds`
