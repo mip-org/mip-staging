@@ -2,7 +2,7 @@
 
 This document explains how to add a new MATLAB package to this channel from a
 GitHub repository URL. Each package is described by a small set of YAML and
-MATLAB files under `packages/<package_name>/releases/<version>/`. On every
+MATLAB files under `packages/<package_name>/<version>/`. On every
 push to `main`, GitHub Actions clones the upstream source per `recipe.yaml`,
 overlays the channel-provided files, runs `mip bundle` (which compiles MEX if
 needed), publishes `.mhl` archives, and updates the channel index.
@@ -32,12 +32,12 @@ Things to determine:
    upstream author to clarify before proceeding. Record the SPDX identifier
    to use as the `license:` field in `mip.yaml`. If the source is intentionally
    permissive but lacks an SPDX file, use `unspecified` (see
-   [kdtree](packages/../../mip-core/packages/kdtree/releases/master/mip.yaml)).
+   [kdtree](packages/../../mip-core/packages/kdtree/master/mip.yaml)).
 
    **MathWorks File Exchange license.** Packages authored by The MathWorks
    typically ship a BSD-3-Clause variant whose third clause limits the
    end-user grant to "MathWorks products and service offerings" (e.g.
-   [dotenv](packages/dotenv/releases/1.1.4/mip.yaml)). Redistribution is
+   [dotenv](packages/dotenv/1.1.4/mip.yaml)). Redistribution is
    permitted, so the channel may carry these. Set
    `license: "LicenseRef-MathWorks"` and note the use restriction in the
    package `README.md` (Step 7).
@@ -48,7 +48,7 @@ Things to determine:
    doesn't map to any SPDX standard identifier. Confirm the terms actually
    allow redistribution — if they do, set
    `license: "LicenseRef-<PackageName>"` (e.g. `LicenseRef-Inpoly` for the
-   [inpoly](packages/inpoly/releases/master/mip.yaml) custom non-commercial
+   [inpoly](packages/inpoly/master/mip.yaml) custom non-commercial
    license). The `LicenseRef-` prefix is SPDX's escape hatch for
    user-defined identifiers, and using a per-package suffix — rather than a
    generic `LicenseRef-Custom` — keeps distinct license families
@@ -129,7 +129,7 @@ Things to determine:
 ## Step 2 — Create the release directory
 
 ```
-packages/<package_name>/releases/<version>/
+packages/<package_name>/<version>/
   recipe.yaml      # required — where to fetch the source from
   mip.yaml         # required unless the upstream repo provides one
   compile.m        # optional — only if MEX/native compilation is needed
@@ -221,7 +221,7 @@ Most FEX packages authored by The MathWorks ship under the
 BSD-3-Clause variant restricted to "MathWorks products and service
 offerings" — use `license: "LicenseRef-MathWorks"` and note the
 restriction in `README.md` (Step 7). See
-[functional_programming_constructs recipe.yaml](packages/functional_programming_constructs/releases/1.2.0.1/recipe.yaml)
+[functional_programming_constructs recipe.yaml](packages/functional_programming_constructs/1.2.0.1/recipe.yaml)
 for a real example.
 
 ### Notes
@@ -230,7 +230,7 @@ for a real example.
   name (`v1.4.1`, `Release_8.0`) — git treats both the same for cloning.
 - `subdirectory:` is useful when a repo contains the MATLAB code under a
   nested folder (e.g. `manopt/` inside the `manopt` repo — see
-  [manopt recipe.yaml](packages/manopt/releases/8.0/recipe.yaml)).
+  [manopt recipe.yaml](packages/manopt/8.0/recipe.yaml)).
   Only supported with `git:` sources.
 - `remove_dirs:` is useful for trimming large test/demo folders that
   bloat the bundle. Works with both `git:` and `zip:` sources.
@@ -272,7 +272,7 @@ builds:
 | `license` | string | SPDX license identifier (e.g. `"MIT"`, `"BSD-3-Clause"`, `"Apache-2.0"`, `"GPL-3.0"`). |
 | `homepage` | string | Project homepage URL. |
 | `repository` | string | Source repository URL. |
-| `dependencies` | list of strings | Other mip packages this one needs at load time (e.g. `["chebfun"]` — see [surfacefun](../mip-core/packages/surfacefun/releases/master/mip.yaml)). Resolved via mip's normal channel priority. |
+| `dependencies` | list of strings | Other mip packages this one needs at load time (e.g. `["chebfun"]` — see [surfacefun](../mip-core/packages/surfacefun/master/mip.yaml)). Resolved via mip's normal channel priority. |
 | `addpaths` | list | Default `addpath` entries (see below). May be overridden per-build. |
 | `release_number` | int | Release counter. Bump this when you republish without changing source/version (e.g. to fix a packaging bug). Defaults to `1`. May also be set per-build. |
 | `builds` | list | One or more build entries (see below). **Required.** |
@@ -296,7 +296,7 @@ addpaths:
 at least one `.m` file. Directories starting with `.`, `+` (MATLAB
 namespaces), or `@` (MATLAB classes) are automatically excluded — MATLAB
 discovers those without an explicit `addpath`. See
-[flam mip.yaml](../mip-core/packages/flam/releases/master/mip.yaml) for a
+[flam mip.yaml](../mip-core/packages/flam/master/mip.yaml) for a
 recursive example.
 
 ### `builds`
@@ -345,7 +345,7 @@ builds:
 
 **MEX where some platforms can compile and others fall back to pure
 MATLAB** (see
-[manopt mip.yaml](packages/manopt/releases/8.0/mip.yaml)):
+[manopt mip.yaml](packages/manopt/8.0/mip.yaml)):
 
 ```yaml
 builds:
@@ -399,13 +399,13 @@ fprintf('=== my_package MEX compilation complete ===\n');
 ### Patterns from existing packages
 
 - Simple single-file MEX —
-  [tfocs/compile.m](packages/tfocs/releases/1.4.1/compile.m).
+  [tfocs/compile.m](packages/tfocs/1.4.1/compile.m).
 - Many MEX files with BLAS/LAPACK linking —
-  [manopt/compile.m](packages/manopt/releases/8.0/compile.m).
+  [manopt/compile.m](packages/manopt/8.0/compile.m).
 - Glob a directory and compile every `.cpp` with C++14 flags —
-  [kdtree/compile.m](../mip-core/packages/kdtree/releases/master/compile.m).
+  [kdtree/compile.m](../mip-core/packages/kdtree/master/compile.m).
 - CMake-driven build of a vendored C++ library before the MEX link —
-  [finufft/compile.m](../mip-core/packages/finufft/releases/2.5.0/compile.m).
+  [finufft/compile.m](../mip-core/packages/finufft/2.5.0/compile.m).
 
 ### Static linking (required)
 
@@ -522,7 +522,7 @@ Install it in the workflow alongside the compiler setup step, not in
   run: sudo apt install -y gcc-10 g++-10 patchelf
 ```
 
-See [gptoolbox/compile.m](packages/gptoolbox/releases/master/compile.m)
+See [gptoolbox/compile.m](packages/gptoolbox/master/compile.m)
 for a full `patchelf` post-build block that iterates every
 `mex/*.mexa64` and applies both fixes.
 - **Clear `LD_LIBRARY_PATH` before `system()` calls on Linux.** MATLAB
@@ -572,8 +572,8 @@ assert(abs(out - 3) < 1e-12, ...
 fprintf('SUCCESS\n');
 ```
 
-See [chunkie/test_chunkie.m](../mip-core/packages/chunkie/releases/master/test_chunkie.m)
-and [kdtree/test_kdtree.m](../mip-core/packages/kdtree/releases/master/test_kdtree.m)
+See [chunkie/test_chunkie.m](../mip-core/packages/chunkie/master/test_chunkie.m)
+and [kdtree/test_kdtree.m](../mip-core/packages/kdtree/master/test_kdtree.m)
 for fuller examples.
 
 > **Note on `+namespace` functions.** `exist('pkg.fcn', 'file')` returns
@@ -632,9 +632,9 @@ At minimum, document:
 - **Tests.** Which `test_<...>.m` scripts are shipped and roughly what
   each exercises.
 
-See [manopt/README.md](packages/manopt/releases/8.0/README.md) for a
+See [manopt/README.md](packages/manopt/8.0/README.md) for a
 small example and
-[gptoolbox/README.md](packages/gptoolbox/releases/master/README.md) for
+[gptoolbox/README.md](packages/gptoolbox/master/README.md) for
 a more detailed one covering trimmed features, static linking, and a
 per-build test split.
 
@@ -647,7 +647,7 @@ mip load --channel mip-org/staging my_package --install
 % ... example body ...
 ```
 
-See [manopt/example.m](packages/manopt/releases/8.0/example.m).
+See [manopt/example.m](packages/manopt/8.0/example.m).
 
 ---
 
@@ -714,7 +714,7 @@ catch later (missing functions, wrong `addpaths`, broken
 ## Step 9 — Hand off for commit and push
 
 When you (the assistant working on this channel) are done writing the
-new files under `packages/<package_name>/releases/<version>/`, **stop
+new files under `packages/<package_name>/<version>/`, **stop
 there**. Do **not** run `git add`, `git commit`, or `git push` on the
 user's behalf unless they explicitly ask for it in the current turn.
 
