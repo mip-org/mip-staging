@@ -274,7 +274,6 @@ builds:
 | `repository` | string | Source repository URL. |
 | `dependencies` | list of strings | Other mip packages this one needs at load time (e.g. `["chebfun"]` — see [surfacefun](../mip-core/packages/surfacefun/master/mip.yaml)). Resolved via mip's normal channel priority. |
 | `addpaths` | list | Default `addpath` entries (see below). May be overridden per-build. |
-| `release_number` | int | Release counter. Bump this when you republish without changing source/version (e.g. to fix a packaging bug). Defaults to `1`. May also be set per-build. |
 | `builds` | list | One or more build entries (see below). **Required.** |
 
 ### `addpaths`
@@ -314,7 +313,6 @@ Each build entry may contain:
 | `architectures` | List of architecture strings this build applies to. **Required.** |
 | `compile_script` | Path (relative to package root) to a MATLAB script that compiles MEX/native code. Run by [`run_compile.m`](../mip/+mip/+build/run_compile.m). |
 | `test_script` | Path to a MATLAB script that exercises the package after install. Run by `mip test`. |
-| `release_number` | Per-build release counter override. |
 | `addpaths` | Per-build override of the top-level `addpaths`. |
 
 Supported architecture values (used by `mip.arch()`):
