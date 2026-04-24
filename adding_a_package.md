@@ -76,10 +76,10 @@ Things to determine:
 
 4. **MATLAB layout.** Identify which subdirectories contain the `.m` files
    that users should have on their MATLAB path. Common patterns:
-   - All `.m` files at the repo root → `addpaths: [{path: "."}]`
-   - A `matlab/` subdirectory → `addpaths: [{path: "matlab"}]`
+   - All `.m` files at the repo root → `paths: [{path: "."}]`
+   - A `matlab/` subdirectory → `paths: [{path: "matlab"}]`
    - A nested toolbox tree where every directory matters →
-     `addpaths: [{path: ".", recursive: true}]`
+     `paths: [{path: ".", recursive: true}]`
 
 5. **MEX / native code.** Look for `.c`, `.cpp`, `.cu`, `.f`, `.f90` files
    alongside MATLAB sources, or `mex` calls in the README/install
@@ -255,7 +255,7 @@ homepage: "https://github.com/owner/repo"
 repository: "https://github.com/owner/repo"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:
@@ -273,10 +273,10 @@ builds:
 | `homepage` | string | Project homepage URL. |
 | `repository` | string | Source repository URL. |
 | `dependencies` | list of strings | Other mip packages this one needs at load time (e.g. `["chebfun"]` — see [surfacefun](../mip-core/packages/surfacefun/master/mip.yaml)). Resolved via mip's normal channel priority. |
-| `addpaths` | list | Default `addpath` entries (see below). May be overridden per-build. |
+| `paths` | list | Default `addpath` entries (see below). May be overridden per-build. |
 | `builds` | list | One or more build entries (see below). **Required.** |
 
-### `addpaths`
+### `paths`
 
 Each entry adds one or more directories to the MATLAB path when the
 package is loaded. Resolved by
@@ -284,7 +284,7 @@ package is loaded. Resolved by
 Two forms are accepted:
 
 ```yaml
-addpaths:
+paths:
   - path: "matlab"                  # add a single directory (relative to package root)
   - path: "."                       # the package root itself
     recursive: true                 # add this dir AND every subdir containing .m files
@@ -313,7 +313,7 @@ Each build entry may contain:
 | `architectures` | List of architecture strings this build applies to. **Required.** |
 | `compile_script` | Path (relative to package root) to a MATLAB script that compiles MEX/native code. Run by [`run_compile.m`](../mip/+mip/+build/run_compile.m). |
 | `test_script` | Path to a MATLAB script that exercises the package after install. Run by `mip test`. |
-| `addpaths` | Per-build override of the top-level `addpaths`. |
+| `paths` | Per-build override of the top-level `paths`. |
 
 Supported architecture values (used by `mip.arch()`):
 
@@ -704,7 +704,7 @@ rm -rf build/
 ```
 
 This workflow is the fastest way to catch issues the CI runner would
-catch later (missing functions, wrong `addpaths`, broken
+catch later (missing functions, wrong `paths`, broken
 `test_<package_name>.m`) before you push.
 
 ---
