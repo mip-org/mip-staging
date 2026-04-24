@@ -88,6 +88,35 @@ Things to determine:
    MEX builds work on `linux_x86_64`, `macos_x86_64`, `macos_arm64`, and
    `windows_x86_64`, but Fortran or CUDA may be more restrictive.
 
+   **Don't reuse upstream's pre-compiled binaries.** Some upstream repos
+   and release bundles ship `.mexa64` / `.mexmaci64` / `.mexmaca64` /
+   `.mexw64` files alongside the source, or distribute per-architecture
+   zips that consist entirely of pre-built binaries. We don't carry
+   those forward — the channel always rebuilds MEX from source on its
+   own CI runners, so we know the provenance, the toolchain flags, and
+   the static-linking posture of every binary we ship. `mip bundle`'s
+   prepare step calls
+   [`+mip/+build/strip_mex_binaries.m`](../mip/+mip/+build/strip_mex_binaries.m)
+   to sweep all MEX extensions out of the source tree **before**
+   running `compile.m`, so even if upstream ships them, they do not
+   make it into the `.mhl`. This means:
+
+   - If the upstream repo contains `.c` / `.cpp` / `.f` sources, write
+     a `compile.m` and the architecture-specific builds that invoke
+     it — as normal.
+   - If the upstream project ships **only** pre-built MATLAB binaries
+     (no sources) — e.g. a MathWorks FEX package with a `.mexa64`
+     and a thin `.m` wrapper, or a vendor distribution of
+     per-platform zips — you can't add it with the channel's normal
+     flow. Either locate the upstream C/C++ source tree and build it
+     from there, or skip the package.
+   - Native shared libraries / archives that aren't MATLAB MEX
+     (`.so`, `.dylib`, `.dll`, `.a`, `.lib`, `.jar`) are **not**
+     auto-stripped. Those are usually linked against by `compile.m`
+     or loaded via `javaaddpath`; evaluate per package whether they
+     are build inputs (keep) or stale artifacts (add them to
+     `remove_dirs` in `recipe.yaml`).
+
 6. **Package name normalization.** Pick a single **canonical** name
    and use it identically in four places: the directory name under
    `packages/`, the `name:` field in `mip.yaml`, the `name` field in the
