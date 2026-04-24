@@ -163,7 +163,7 @@ source:
   git: "https://github.com/<owner>/<repo>"   # repo URL (required if using git)
   branch: "v1.4.1"                            # branch OR tag name (optional)
   subdirectory: "matlab"                      # extract only this subdir (optional)
-  remove_dirs: [tests, examples, docs]        # delete these dirs after clone (optional)
+  remove_dirs: [html, deprecated, dev]        # delete these dirs after clone (optional)
 ```
 
 ### Alternate: ZIP source
@@ -173,7 +173,7 @@ If a project does not have a public git repo, a direct ZIP URL works:
 ```yaml
 source:
   zip: "https://example.com/path/to/release.zip"
-  remove_dirs: [html, docs]   # optional — same semantics as the git form
+  remove_dirs: [html, deprecated]   # optional — same semantics as the git form
 ```
 
 Both `zip` and `git` sources honor `remove_dirs:` (see
@@ -232,8 +232,15 @@ for a real example.
   nested folder (e.g. `manopt/` inside the `manopt` repo — see
   [manopt recipe.yaml](packages/manopt/8.0/recipe.yaml)).
   Only supported with `git:` sources.
-- `remove_dirs:` is useful for trimming large test/demo folders that
-  bloat the bundle. Works with both `git:` and `zip:` sources.
+- `remove_dirs:` is useful for trimming trees that should not ship at
+  all — pre-rendered HTML docs (`html`, `website`), deprecated/legacy
+  code kept only for upstream reference (`deprecated`, `old`), internal
+  developer scaffolding (`dev`, `develop`, `sandbox`), or vendored
+  heavy third-party code that `compile.m` will disable. Works with
+  both `git:` and `zip:` sources. For `tests/`, `examples/`, and
+  `benchmarks/` — which users may reasonably want to opt into — prefer
+  shipping them and declaring `extra_paths` in `mip.yaml` (Step 4)
+  instead of deleting them here.
 - The `.git/` directory is automatically removed after clone.
 
 ---
@@ -274,6 +281,7 @@ builds:
 | `repository` | string | Source repository URL. |
 | `dependencies` | list of strings | Other mip packages this one needs at load time (e.g. `["chebfun"]` — see [surfacefun](../mip-core/packages/surfacefun/master/mip.yaml)). Resolved via mip's normal channel priority. |
 | `paths` | list | Default `addpath` entries (see below). May be overridden per-build. |
+| `extra_paths` | mapping | Named groups of optional directories (e.g. `examples`, `tests`) that users opt into via `mip load --with <group>` (see below). |
 | `builds` | list | One or more build entries (see below). **Required.** |
 
 ### `paths`
@@ -297,6 +305,55 @@ namespaces), or `@` (MATLAB classes) are automatically excluded — MATLAB
 discovers those without an explicit `addpath`. See
 [flam mip.yaml](../mip-core/packages/flam/master/mip.yaml) for a
 recursive example.
+
+### `extra_paths`
+
+`extra_paths` declares **named groups** of optional directories that are
+**not** added to the MATLAB path on a plain `mip load <package>`. Users
+opt in on a per-load basis with `mip load <package> --with <group>` (the
+flag may be repeated to request several groups at once). This is the
+right home for `examples/`, `tests/`, `benchmarks/`, and similar
+sub-trees that are useful to some users but would pollute the default
+namespace for everyone else.
+
+The shape is a mapping of group name → list of path entries, where each
+entry has the same form as a top-level `paths` entry (including
+`recursive` and `exclude`). Parsed by
+[`+mip/+config/read_mip_yaml.m`](../mip/+mip/+config/read_mip_yaml.m)
+and applied at load time by `applyExtraPaths` in
+[`+mip/load.m`](../mip/+mip/load.m).
+
+```yaml
+paths:
+  - path: "."
+
+extra_paths:
+  examples:
+    - path: "examples"
+  tests:
+    - path: "tests"
+  benchmarks:
+    - path: "benchmarks"
+      recursive: true
+```
+
+With the above, `mip load my_package` adds only the package root, while
+`mip load my_package --with examples --with tests` additionally puts
+`examples/` and `tests/` on the path.
+
+Group names are free-form strings, but the `tests`, `examples`, and
+`benchmarks` names are the conventional ones (`mip init` auto-populates
+those three when scaffolding a new `mip.yaml` — see
+[`+mip/+init/auto_add_paths.m`](../mip/+mip/+init/auto_add_paths.m)).
+Stick to the conventional names unless the package has a good reason to
+ship an additional, distinctly-named bucket.
+
+**`extra_paths` vs `remove_dirs`.** If a test/demo tree is only heavy on
+disk but otherwise harmless to ship, prefer listing it under
+`extra_paths` so curious users can still opt in via `--with`. Reserve
+`remove_dirs:` in `recipe.yaml` for trees that are large enough to
+bloat the bundle materially, or that contain files that shouldn't be
+redistributed at all.
 
 ### `builds`
 
