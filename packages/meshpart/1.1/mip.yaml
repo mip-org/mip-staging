@@ -1,0 +1,19 @@
+name: meshpart
+description: "Mesh partitioning toolbox: spectral, geometric, geometric-spectral, coordinate, and inertial bisection, plus nested dissection and vertex separators."
+version: "1.1"
+license: "LicenseRef-Meshpart"
+homepage: "https://github.com/YingzhouLi/meshpart"
+repository: "https://github.com/YingzhouLi/meshpart"
+dependencies: []
+
+paths:
+  - path: "src"
+    recursive: true
+
+extra_paths:
+  examples:
+    - path: "test"
+
+builds:
+  - architectures: [any]
+    test_script: test_meshpart.m
