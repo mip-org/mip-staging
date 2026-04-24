@@ -6,7 +6,7 @@ homepage: "https://github.com/mathworks/dotenv-for-MATLAB"
 repository: "https://github.com/mathworks/dotenv-for-MATLAB"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

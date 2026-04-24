@@ -6,7 +6,7 @@ homepage: "https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-v
 repository: "https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-vline"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

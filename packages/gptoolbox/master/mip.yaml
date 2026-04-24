@@ -6,7 +6,7 @@ homepage: "https://github.com/alecjacobson/gptoolbox"
 repository: "https://github.com/alecjacobson/gptoolbox"
 dependencies: []
 
-addpaths:
+paths:
   - path: external
     recursive: true
   - path: imageprocessing

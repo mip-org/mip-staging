@@ -6,7 +6,7 @@ homepage: "http://cvxr.com/tfocs/"
 repository: "https://github.com/cvxr/TFOCS"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

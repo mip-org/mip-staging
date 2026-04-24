@@ -6,7 +6,7 @@ homepage: "https://www.manopt.org"
 repository: "https://github.com/NicolasBoumal/manopt"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
     recursive: true
 

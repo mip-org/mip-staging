@@ -6,7 +6,7 @@ homepage: "https://github.com/tinevez/matlab-tree"
 repository: "https://github.com/tinevez/matlab-tree"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

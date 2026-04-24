@@ -6,7 +6,7 @@ homepage: "https://github.com/matlab2tikz/matlab2tikz"
 repository: "https://github.com/matlab2tikz/matlab2tikz"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

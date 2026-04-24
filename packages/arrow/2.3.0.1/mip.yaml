@@ -6,7 +6,7 @@ homepage: "https://www.mathworks.com/matlabcentral/fileexchange/278-arrow"
 repository: "https://www.mathworks.com/matlabcentral/fileexchange/278-arrow"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

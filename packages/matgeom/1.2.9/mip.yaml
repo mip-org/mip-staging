@@ -6,7 +6,7 @@ homepage: "https://github.com/mattools/matGeom"
 repository: "https://github.com/mattools/matGeom"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
   - path: "geom2d"
   - path: "polygons2d"

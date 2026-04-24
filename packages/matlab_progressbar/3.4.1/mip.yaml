@@ -6,7 +6,7 @@ homepage: "https://github.com/JAAdrian/MatlabProgressBar"
 repository: "https://github.com/JAAdrian/MatlabProgressBar"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

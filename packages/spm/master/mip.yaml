@@ -6,7 +6,7 @@ homepage: "https://www.fil.ion.ucl.ac.uk/spm/"
 repository: "https://github.com/spm/spm"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

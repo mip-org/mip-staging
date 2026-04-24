@@ -6,7 +6,7 @@ homepage: "https://github.com/mathworks/docmaker"
 repository: "https://github.com/mathworks/docmaker"
 dependencies: []
 
-addpaths:
+paths:
   - path: "docmaker"
   - path: "docmakerdoc"
 
