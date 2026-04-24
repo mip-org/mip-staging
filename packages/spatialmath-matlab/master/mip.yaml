@@ -1,0 +1,18 @@
+name: spatialmath-matlab
+description: "Spatial Math Toolbox for MATLAB: SO(2)/SE(2)/SO(3)/SE(3) rotations, homogeneous transforms, unit quaternions, twists, and plotting."
+version: "master"
+license: "MIT"
+homepage: "https://github.com/petercorke/spatialmath-matlab"
+repository: "https://github.com/petercorke/spatialmath-matlab"
+dependencies: []
+
+paths:
+  - path: "."
+
+extra_paths:
+  tests:
+    - path: "unit_test"
+
+builds:
+  - architectures: [any]
+    test_script: test_spatialmath.m
