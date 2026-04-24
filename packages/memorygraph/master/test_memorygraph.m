@@ -1,4 +1,4 @@
-% Test script for memorygraph.
+% Test script for memorygraph
 
 %% Functions are on the path
 fprintf('Checking memorygraph + vline are on path...\n');
