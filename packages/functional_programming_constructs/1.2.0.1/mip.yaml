@@ -6,7 +6,7 @@ homepage: "https://www.mathworks.com/matlabcentral/fileexchange/39735-functional
 repository: "https://www.mathworks.com/matlabcentral/fileexchange/39735-functional-programming-constructs"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

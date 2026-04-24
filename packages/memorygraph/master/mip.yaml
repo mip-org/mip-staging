@@ -6,7 +6,7 @@ homepage: "https://github.com/ahbarnett/memorygraph"
 repository: "https://github.com/ahbarnett/memorygraph"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:

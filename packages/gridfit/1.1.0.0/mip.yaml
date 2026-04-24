@@ -6,7 +6,7 @@ homepage: "https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fit
 repository: "https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit"
 dependencies: []
 
-addpaths:
+paths:
   - path: "gridfitdir"
 
 builds:

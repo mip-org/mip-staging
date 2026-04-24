@@ -6,7 +6,7 @@ homepage: "https://github.com/dengwirda/inpoly"
 repository: "https://github.com/dengwirda/inpoly"
 dependencies: []
 
-addpaths:
+paths:
   - path: "."
 
 builds:
