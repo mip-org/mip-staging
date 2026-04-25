@@ -1,6 +1,6 @@
 name: gptoolbox
 description: "Geometry Processing Toolbox — MATLAB functions for mesh processing, discrete differential geometry, and geometric optimization."
-version: master
+version:
 license: "MIT"
 homepage: "https://github.com/alecjacobson/gptoolbox"
 repository: "https://github.com/alecjacobson/gptoolbox"

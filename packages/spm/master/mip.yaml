@@ -1,6 +1,6 @@
 name: spm
 description: "Statistical Parametric Mapping — analysis of brain imaging data sequences (fMRI, PET, SPECT, EEG, MEG)."
-version: master
+version:
 license: "GPL-2.0"
 homepage: "https://www.fil.ion.ucl.ac.uk/spm/"
 repository: "https://github.com/spm/spm"
