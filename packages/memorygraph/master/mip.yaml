@@ -1,6 +1,6 @@
 name: memorygraph
 description: "Record true MATLAB/octave RAM and CPU usage vs time (Linux only)."
-version: "master"
+version:
 license: "Apache-2.0"
 homepage: "https://github.com/ahbarnett/memorygraph"
 repository: "https://github.com/ahbarnett/memorygraph"
