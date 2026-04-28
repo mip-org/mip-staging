@@ -350,9 +350,9 @@ class PackagePreparer:
             # Build the .mhl filename for cache check. Canonical package
             # names may contain '-', but the filename uses '-' as a field
             # separator, so encode the name with '_' in the filename.
-            version = mip_yaml.get('version', release_version)
+            # version = mip_yaml.get('version', release_version)
             name_for_filename = mip_yaml['name'].replace('-', '_')
-            mhl_filename = (f"{name_for_filename}-{version}-"
+            mhl_filename = (f"{name_for_filename}-{release_version}-"
                             f"{effective_arch}.mhl")
 
             # Check cache
@@ -366,7 +366,7 @@ class PackagePreparer:
                 continue
 
             # Create output directory: build/prepared/{name}-{version}/
-            output_name = f"{mip_yaml['name']}-{version}"
+            output_name = f"{mip_yaml['name']}-{release_version}"
             output_path = os.path.join(self.output_dir, output_name)
 
             if os.path.exists(output_path):
