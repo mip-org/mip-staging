@@ -1,0 +1,19 @@
+name: disk-conformal-map
+description: "Fast disk conformal parameterization: angle-preserving mapping of simply-connected open triangle meshes to the unit disk."
+version: "master"
+license: "Apache-2.0"
+homepage: "https://www.math.cuhk.edu.hk/~ptchoi"
+repository: "https://github.com/garyptchoi/disk-conformal-map"
+dependencies: []
+
+paths:
+  - path: "mfile"
+  - path: "extension"
+
+extra_paths:
+  examples:
+    - path: "."
+
+builds:
+  - architectures: [any]
+    test_script: test_disk_conformal_map.m
