@@ -446,9 +446,10 @@ Always keep an `[any]` fallback when the MEX layer is optional — it lets
 users on unusual architectures still load the pure-MATLAB parts.
 
 When you have a MEX build **and** an `[any]` fallback, use **two test
-scripts** — one per build entry (see Step 6). The MEX build should test
-at least one compiled function so a broken build/link is caught by
-`mip test`; the `[any]` build tests only the pure-MATLAB layer.
+scripts** — one per build entry (see Step 6). The MEX build's test must
+call **every** compiled MEX function the package ships — CI fails the
+build if any shipped MEX goes un-exercised (see Step 6). The `[any]`
+build tests only the pure-MATLAB layer.
 
 ---
 
@@ -636,6 +637,17 @@ The test script is run by `mip test <package_name>` after the package is
 loaded. It should:
 
 - Use only the public API of the package (it runs after `mip load`).
+- **Exercise every MEX file the package builds.** Each compiled MEX
+  function must actually be *called* by the test script that runs on the
+  architectures where it is built — not merely present on disk. This is
+  not just good practice: CI enforces it. After `mip test`, the build
+  runner inspects MATLAB's `inmem` list (a MEX appears there only once it
+  has been invoked) and compares it against the set of MEX shipped in the
+  package. Any built-but-never-loaded MEX fails the build with
+  `mip:test:mexNotExercised`. So if the package compiles 30 MEX files,
+  the test must call all 30, or the package won't ship. See the MEX
+  guidance below for how to split coverage when there is also an `[any]`
+  fallback build.
 - `assert(...)` on each invariant that should hold.
 - `fprintf('SUCCESS\n')` at the very end so a successful run is obvious.
 - Be deterministic — call `rng('default')` if any randomness is involved.
@@ -674,18 +686,24 @@ If `mip.yaml` has both an architecture-specific MEX build and an
 **two** test scripts and wire each build entry to its own
 `test_script:`:
 
-- `test_<package_name>_mex.m` — exercises both the pure-MATLAB layer
-  **and** at least one compiled MEX function. This catches broken
+- `test_<package_name>_mex.m` — exercises the pure-MATLAB layer **and
+  every compiled MEX function the package builds**. This catches broken
   builds, missing symbols, ABI mismatches, and disabled-feature
-  regressions at `mip test` time rather than in user code.
+  regressions at `mip test` time rather than in user code. The CI
+  coverage gate (above) means partial coverage isn't an option: a MEX
+  that the test never calls fails the build, so this script must touch
+  the package's full set of shipped MEX.
 - `test_<package_name>.m` — exercises only the pure-MATLAB layer. Used
   by the `[any]` fallback build on architectures where MEX is
-  unavailable.
+  unavailable. Because no MEX is built for the `[any]` arch, the coverage
+  gate is a no-op here.
 
-A MEX function call that returns a simple deterministic value (think
-`fast_sparse` vs `sparse`, a predicate like `orient2d`, or a closed-form
-geometric result) is ideal for the MEX test — quick, doesn't depend on
-external data, fails loudly if the binary is broken.
+Each MEX call should return a simple deterministic value that can be
+`assert`ed (think `fast_sparse` vs `sparse`, a predicate like `orient2d`,
+or a closed-form geometric result) — quick, no external data, and it
+fails loudly if the binary is broken. When a package ships many MEX
+files, loop over them or call each in turn; the goal is that no shipped
+MEX is left un-invoked when the test finishes.
 
 ---
 
