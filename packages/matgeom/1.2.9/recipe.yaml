@@ -1,5 +1,0 @@
-source:
-  git: "https://github.com/mattools/matGeom"
-  branch: "v1.2.9"
-  subdirectory: "matGeom"
-  remove_dirs: [deprecated]

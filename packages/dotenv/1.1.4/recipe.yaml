@@ -1,3 +1,0 @@
-source:
-  git: "https://github.com/mathworks/dotenv-for-MATLAB"
-  branch: "v1.1.4"

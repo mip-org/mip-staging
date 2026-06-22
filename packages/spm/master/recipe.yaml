@@ -1,3 +1,0 @@
-source:
-  git: "https://github.com/spm/spm"
-  remove_dirs: [tests]
