@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-23T10:12:05Z",
+  "generated": "2026-06-24T09:58:53Z",
   "repo": "mip-org/mip-staging",
   "total_lifetime_downloads": 15,
   "assets": {
@@ -10,7 +10,7 @@
       "asset_id": 388300344,
       "created_at": "2026-04-03T23:47:39Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "TFOCS-1.4.1/TFOCS-1.4.1-linux_x86_64.mhl": {
       "lifetime": 1,
@@ -19,7 +19,7 @@
       "asset_id": 388300517,
       "created_at": "2026-04-03T23:47:55Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "TFOCS-1.4.1/TFOCS-1.4.1-macos_arm64.mhl": {
       "lifetime": 1,
@@ -28,7 +28,7 @@
       "asset_id": 388301084,
       "created_at": "2026-04-03T23:48:42Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "TFOCS-1.4.1/TFOCS-1.4.1-macos_x86_64.mhl": {
       "lifetime": 0,
@@ -37,7 +37,7 @@
       "asset_id": 388302096,
       "created_at": "2026-04-03T23:50:20Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "arrow-2.3.0.1/arrow-2.3.0.1-any.mhl": {
       "lifetime": 6,
@@ -46,7 +46,7 @@
       "asset_id": 404392635,
       "created_at": "2026-04-24T11:54:05Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "chebfun-5.7.0/chebfun-5.7.0-any.mhl": {
       "lifetime": 2,
@@ -55,7 +55,7 @@
       "asset_id": 412957960,
       "created_at": "2026-05-05T20:53:07Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "chebfun-master/chebfun-master-any.mhl": {
       "lifetime": 0,
@@ -64,7 +64,7 @@
       "asset_id": 412958021,
       "created_at": "2026-05-05T20:53:10Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "cmocean-main/cmocean-main-any.mhl": {
       "lifetime": 0,
@@ -73,7 +73,7 @@
       "asset_id": 407432966,
       "created_at": "2026-04-28T13:53:03Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "docmaker-0.7/docmaker-0.7-any.mhl": {
       "lifetime": 0,
@@ -82,7 +82,7 @@
       "asset_id": 404392688,
       "created_at": "2026-04-24T11:54:11Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "dotenv-1.1.4/dotenv-1.1.4-any.mhl": {
       "lifetime": 0,
@@ -91,7 +91,7 @@
       "asset_id": 404392744,
       "created_at": "2026-04-24T11:54:14Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "export_fig-3.54/export_fig-3.54-any.mhl": {
       "lifetime": 0,
@@ -100,7 +100,7 @@
       "asset_id": 412851791,
       "created_at": "2026-05-05T17:49:24Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "finufft-2.5.1/finufft-2.5.1-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -109,7 +109,7 @@
       "asset_id": 455061605,
       "created_at": "2026-06-22T23:30:11Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "finufft-2.5.1/finufft-2.5.1-macos_arm64.mhl": {
       "lifetime": 0,
@@ -118,7 +118,7 @@
       "asset_id": 455060927,
       "created_at": "2026-06-22T23:29:20Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "finufft-2.5.1/finufft-2.5.1-numbl_wasm.mhl": {
       "lifetime": 0,
@@ -127,7 +127,7 @@
       "asset_id": 455060767,
       "created_at": "2026-06-22T23:29:05Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "fmm2d-main/fmm2d-main-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -136,7 +136,7 @@
       "asset_id": 455008200,
       "created_at": "2026-06-22T22:13:12Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "fmm2d-main/fmm2d-main-macos_arm64.mhl": {
       "lifetime": 0,
@@ -145,7 +145,7 @@
       "asset_id": 454993279,
       "created_at": "2026-06-22T21:52:48Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "fmm2d-main/fmm2d-main-numbl_wasm.mhl": {
       "lifetime": 0,
@@ -154,7 +154,7 @@
       "asset_id": 455007524,
       "created_at": "2026-06-22T22:12:07Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "fmm2d-main/fmm2d-main-windows_x86_64.mhl": {
       "lifetime": 0,
@@ -163,7 +163,7 @@
       "asset_id": 454993112,
       "created_at": "2026-06-22T21:52:29Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "functional_programming_constructs-1.2.0.1/functional_programming_constructs-1.2.0.1-any.mhl": {
       "lifetime": 0,
@@ -172,7 +172,7 @@
       "asset_id": 404392792,
       "created_at": "2026-04-24T11:54:16Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "gptoolbox-master/gptoolbox-master-any.mhl": {
       "lifetime": 0,
@@ -181,7 +181,7 @@
       "asset_id": 404392823,
       "created_at": "2026-04-24T11:54:19Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "gptoolbox-master/gptoolbox-master-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -190,7 +190,7 @@
       "asset_id": 404399884,
       "created_at": "2026-04-24T12:05:08Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "gptoolbox-master/gptoolbox-master-macos_arm64.mhl": {
       "lifetime": 0,
@@ -199,7 +199,7 @@
       "asset_id": 404400986,
       "created_at": "2026-04-24T12:06:52Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "gptoolbox-master/gptoolbox-master-macos_x86_64.mhl": {
       "lifetime": 0,
@@ -208,7 +208,7 @@
       "asset_id": 404434261,
       "created_at": "2026-04-24T12:46:17Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "gridfit-1.1.0.0/gridfit-1.1.0.0-any.mhl": {
       "lifetime": 0,
@@ -217,7 +217,7 @@
       "asset_id": 404392884,
       "created_at": "2026-04-24T11:54:23Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "hline_and_vline-1.0.0.0/hline_and_vline-1.0.0.0-any.mhl": {
       "lifetime": 0,
@@ -226,7 +226,7 @@
       "asset_id": 404392921,
       "created_at": "2026-04-24T11:54:26Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "inpoly-master/inpoly-master-any.mhl": {
       "lifetime": 1,
@@ -235,7 +235,7 @@
       "asset_id": 407432986,
       "created_at": "2026-04-28T13:53:06Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "kdtree-master/kdtree-master-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -244,7 +244,7 @@
       "asset_id": 412851009,
       "created_at": "2026-05-05T17:48:09Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "kdtree-master/kdtree-master-windows_x86_64.mhl": {
       "lifetime": 1,
@@ -253,7 +253,7 @@
       "asset_id": 412850625,
       "created_at": "2026-05-05T17:47:33Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "manopt-8.0/manopt-8.0-any.mhl": {
       "lifetime": 0,
@@ -262,7 +262,7 @@
       "asset_id": 404392964,
       "created_at": "2026-04-24T11:54:31Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "manopt-8.0/manopt-8.0-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -271,7 +271,7 @@
       "asset_id": 404400264,
       "created_at": "2026-04-24T12:05:28Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "manopt-8.0/manopt-8.0-macos_arm64.mhl": {
       "lifetime": 0,
@@ -280,7 +280,7 @@
       "asset_id": 404401692,
       "created_at": "2026-04-24T12:08:03Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "manopt-8.0/manopt-8.0-macos_x86_64.mhl": {
       "lifetime": 0,
@@ -289,7 +289,7 @@
       "asset_id": 404434406,
       "created_at": "2026-04-24T12:46:34Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matGeom-1.2.9/matGeom-1.2.9-any.mhl": {
       "lifetime": 2,
@@ -298,7 +298,7 @@
       "asset_id": 396984973,
       "created_at": "2026-04-15T12:27:02Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matgeom-1.2.9/matgeom-1.2.9-any.mhl": {
       "lifetime": 0,
@@ -307,7 +307,7 @@
       "asset_id": 404393001,
       "created_at": "2026-04-24T11:54:34Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matlab2tikz-1.1.0/matlab2tikz-1.1.0-any.mhl": {
       "lifetime": 0,
@@ -316,7 +316,7 @@
       "asset_id": 404393020,
       "created_at": "2026-04-24T11:54:37Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matlab_progressbar-3.4.1/matlab_progressbar-3.4.1-any.mhl": {
       "lifetime": 0,
@@ -325,7 +325,7 @@
       "asset_id": 404393042,
       "created_at": "2026-04-24T11:54:40Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matlab_schemer-1.4.0/matlab_schemer-1.4.0-any.mhl": {
       "lifetime": 0,
@@ -334,7 +334,7 @@
       "asset_id": 404393061,
       "created_at": "2026-04-24T11:54:43Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "matlab_tree-master/matlab_tree-master-any.mhl": {
       "lifetime": 0,
@@ -343,7 +343,7 @@
       "asset_id": 407433009,
       "created_at": "2026-04-28T13:53:10Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "memorygraph-master/memorygraph-master-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -352,7 +352,7 @@
       "asset_id": 407433337,
       "created_at": "2026-04-28T13:53:49Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "sdpt3-master/sdpt3-master-numbl_wasm.mhl": {
       "lifetime": 0,
@@ -361,7 +361,7 @@
       "asset_id": 412853559,
       "created_at": "2026-05-05T17:52:59Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "spm-master/spm-master-any.mhl": {
       "lifetime": 0,
@@ -370,7 +370,7 @@
       "asset_id": 407433039,
       "created_at": "2026-04-28T13:53:13Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "spm-master/spm-master-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -379,7 +379,7 @@
       "asset_id": 407433379,
       "created_at": "2026-04-28T13:53:52Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "spm-master/spm-master-macos_arm64.mhl": {
       "lifetime": 0,
@@ -388,7 +388,7 @@
       "asset_id": 407434959,
       "created_at": "2026-04-28T13:56:34Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "spm-master/spm-master-macos_x86_64.mhl": {
       "lifetime": 0,
@@ -397,7 +397,7 @@
       "asset_id": 404434449,
       "created_at": "2026-04-24T12:46:38Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "tfocs-1.4.1/tfocs-1.4.1-any.mhl": {
       "lifetime": 0,
@@ -406,7 +406,7 @@
       "asset_id": 404393170,
       "created_at": "2026-04-24T11:54:57Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "tfocs-1.4.1/tfocs-1.4.1-linux_x86_64.mhl": {
       "lifetime": 0,
@@ -415,7 +415,7 @@
       "asset_id": 404400439,
       "created_at": "2026-04-24T12:05:42Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "tfocs-1.4.1/tfocs-1.4.1-macos_arm64.mhl": {
       "lifetime": 0,
@@ -424,7 +424,7 @@
       "asset_id": 404401828,
       "created_at": "2026-04-24T12:08:17Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     },
     "tfocs-1.4.1/tfocs-1.4.1-macos_x86_64.mhl": {
       "lifetime": 0,
@@ -433,7 +433,7 @@
       "asset_id": 404434557,
       "created_at": "2026-04-24T12:46:47Z",
       "first_seen": "2026-06-23T10:12:05Z",
-      "updated": "2026-06-23T10:12:05Z"
+      "updated": "2026-06-24T09:58:53Z"
     }
   }
 }
