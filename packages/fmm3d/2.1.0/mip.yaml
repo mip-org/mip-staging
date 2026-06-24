@@ -1,0 +1,26 @@
+name: fmm3d
+description: "Flatiron Institute Fast Multipole Methods in 3D"
+version: "2.1.0"
+license: "Apache-2.0"
+homepage: "https://github.com/flatironinstitute/fmm3d"
+repository: "https://github.com/flatironinstitute/fmm3d"
+dependencies: []
+
+# matlab/ holds the wrappers (lfmm3d, hfmm3d, stfmm3d, emfmm3d and their
+# direct-sum references), the legacy CMCL wrappers (lfmm3dpart, hfmm3dpart,
+# ...), the example/test scripts, and the two mwrap MEX gateways built by
+# compile*.m: fmm3d (modern API) and fmm3d_legacy (legacy API).
+paths:
+  - path: "matlab"
+
+# fmm3d is MEX-only: the .m wrappers dispatch into the compiled gateways, so
+# there is no useful pure-MATLAB `any` fallback. Built from the upstream
+# Fortran via the makefile (no transpile); the package needs no extra channel
+# files beyond compile*.m.
+builds:
+  - architectures: [linux_x86_64, macos_arm64]
+    compile_script: compile.m
+    test_script: test_fmm3d.m
+  - architectures: [windows_x86_64]
+    compile_script: compile_windows.m
+    test_script: test_fmm3d.m
