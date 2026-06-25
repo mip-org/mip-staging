@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-25
+
+- `build-package` caller: repoint from `@staging` to `@main` and forward the
+  `publish` and `source_repo` inputs to the reusable workflow. Test builds
+  (`publish` unchecked) now publish the `.mhl` to a rolling `_test-builds`
+  prerelease with a direct download URL, instead of leaving it only as a
+  workflow artifact.
+
 ## 2026-06-24
 
 - Added `fmm3d` 2.1.0 (Flatiron Institute Fast Multipole Methods in 3D).
