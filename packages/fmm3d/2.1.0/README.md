@@ -45,8 +45,9 @@ build from the upstream repository.
 ## Architectures
 
 Pre-compiled MEX binaries ship for `linux_x86_64`, `macos_arm64`, and
-`windows_x86_64`. Intel macOS is not built. There is no pure-MATLAB fallback —
-the package needs the MEX to do any work.
+`windows_x86_64`, plus a `numbl_wasm` build (below). Intel macOS is not built.
+There is no pure-MATLAB fallback — the package needs the MEX (or the WASM) to
+do any work.
 
 The Linux and macOS MEX link the gfortran/OpenMP runtime dynamically; `mip
 bundle` then vendors the required shared libraries (`libgfortran`, `libgomp`)
@@ -59,6 +60,18 @@ MinGW runtime DLL dependency.
 The default flags' `-march=native` is dropped so the binaries run on a generic
 CPU of each platform. OpenMP is enabled (`-fopenmp`); set `OMP_NUM_THREADS` to
 control parallelism.
+
+### numbl WASM
+
+The `numbl_wasm` build runs fmm3d in [numbl](https://github.com/magland/numbl)
+(MATLAB-in-the-browser/JS). There is no practical Fortran→WASM path, so
+`matlab/numbl/build_wasm.sh` transpiles the upstream Fortran to C with
+[`fort2c`](https://github.com/magland/fort2c) and compiles it to two standalone
+modules with Emscripten — `fmm3d.wasm` and `fmm3d_legacy.wasm`, one per mwrap
+gateway. The `fmm3d.numbl.js` / `fmm3d_legacy.numbl.js` builtins marshal each
+call through those modules in place of the native MEX. The whole Fortran
+library (Laplace, Helmholtz, Stokes, Maxwell) is transpiled; the Helmholtz
+plane-wave quadrature tables make these modules a few MB each.
 
 ## Test
 

@@ -3,12 +3,17 @@
 ## 2026-06-24
 
 - Added `fmm3d` 2.1.0 (Flatiron Institute Fast Multipole Methods in 3D).
-  Source points at the real `flatironinstitute/fmm3d` (tag `v2.1.0`); built
-  from the upstream Fortran via the makefile (no transpile). Ships native MEX
-  for `linux_x86_64`, `macos_arm64`, and `windows_x86_64`: two gateways,
-  `fmm3d` (modern API) and `fmm3d_legacy` (legacy CMCL API). `-march=native`
-  is dropped for portability; other-language bindings and the vectorized
-  `FAST_KER` kernels are trimmed.
+  Source points at the real `flatironinstitute/fmm3d` (tag `v2.1.0`). Two
+  mwrap gateways, `fmm3d` (modern API) and `fmm3d_legacy` (legacy CMCL API).
+  - Native MEX for `linux_x86_64`, `macos_arm64`, `windows_x86_64`, built from
+    the upstream Fortran via the makefile (no transpile). `-march=native` is
+    dropped for portability; other-language bindings and the vectorized
+    `FAST_KER` kernels are trimmed.
+  - `numbl_wasm` build: the Fortran is transpiled to C with `fort2c` and
+    compiled to `fmm3d.wasm` / `fmm3d_legacy.wasm` with Emscripten, dispatched
+    by the `fmm3d.numbl.js` / `fmm3d_legacy.numbl.js` builtins (`matlab/numbl/`).
+    Requires `fort2c` features (ENTRY/FORMAT/STOP, INTEGER*8 conversions, large
+    machine-generated tables) added upstream in `magland/fort2c`.
 
 ## 2026-06-22
 
