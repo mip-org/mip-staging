@@ -2,6 +2,19 @@
 
 ## 2026-06-25
 
+- Added `fmm3dbie` (fast multipole accelerated boundary integral equation
+  solvers in 3D). Source points at `fastalgorithms/fmm3dbie`, tracking `master`
+  (no release tags). The single `fmm3dbie_routs` mwrap gateway statically links
+  the vendored FMM3D submodule (fetched via the new `submodules: true` source
+  flag). Declares a dependency on the sibling `fmm3d` package.
+  - Native MEX for `linux_x86_64`, `macos_arm64`, `windows_x86_64`, built from
+    the upstream Fortran via the makefile (no transpile). `-march=native` is
+    dropped for portability; other-language bindings and the example/test/doc
+    trees (and the same in the FMM3D submodule) are trimmed. BLAS/LAPACK resolve
+    to MATLAB's `libmwblas`/`libmwlapack`.
+  - No `numbl_wasm` build: unlike fmm3d, fmm3dbie links BLAS/LAPACK, which has no
+    MATLAB-provided equivalent under wasm; deferred to a follow-up.
+
 - `build-package` caller: repoint from `@staging` to `@main` and forward the
   `publish` and `source_repo` inputs to the reusable workflow. Test builds
   (`publish` unchecked) now publish the `.mhl` to a rolling `_test-builds`
