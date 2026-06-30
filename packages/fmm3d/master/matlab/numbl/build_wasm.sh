@@ -46,16 +46,24 @@ mkdir -p "$GEN_DIR"
 # carried alongside this script). Put it on the include path next to them.
 cp "$SCRIPT_DIR/fmm3d_c.h" "$GEN_DIR/fmm3d_c.h"
 
-# Step 0: transpile every Fortran source listed in files.sh to C with fort2c.
+# Step 0: transpile every Fortran source listed in files.sh to C with fort2c,
+# in parallel. The three large machine-generated table files (hwts3e and its
+# INCLUDEd weight files, hnumphys, hnumfour) dominate transpile time, so
+# overlapping them with each other and the rest cuts the wall time to roughly
+# the single slowest file. Each fort2c writes a distinct <name>.c/.h, so the
+# parallel writes don't collide.
 source "$SCRIPT_DIR/files.sh"
-echo "=== Transpiling ${#FILES[@]} Fortran files with fort2c ==="
-for row in "${FILES[@]}"; do
-  IFS='|' read -r name src only <<< "$row"
+echo "=== Transpiling ${#FILES[@]} Fortran files with fort2c (-j$NJOBS) ==="
+transpile_one() {
+  IFS='|' read -r name src only <<< "$1"
   onlyarg=(); [ -n "$only" ] && onlyarg=(--only "$only")
   echo "  F2C $src -> $name.c"
   fort2c "$FMM3D_SRC/$src" --basename "$name" "${onlyarg[@]}" \
     --runtime-header fmm3d_c.h --guard-prefix FMM3D_ -o "$GEN_DIR" >/dev/null
-done
+}
+export -f transpile_one
+export FMM3D_SRC GEN_DIR
+printf '%s\n' "${FILES[@]}" | xargs -P "$NJOBS" -I{} bash -c 'transpile_one "$@"' _ {}
 
 SHIM_INC="-I$SCRIPT_DIR/mex_shim"
 # The mwrap gateways declare the Fortran routines with MWF77_RETURN (default

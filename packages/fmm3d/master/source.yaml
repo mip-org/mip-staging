@@ -11,5 +11,5 @@
 # links matlab/*.c, so none of these are build inputs.
 source:
   git: "https://github.com/flatironinstitute/fmm3d"
-  branch: "v2.1.0"
+  branch: "master"
   remove_dirs: [c, python, julia, examples, test, docs, devel, vec-kernels]
