@@ -1,0 +1,26 @@
+name: chebfun
+description: "Chebfun is an open-source software system for numerical computing with functions."
+version: "5.7.0"
+license: "BSD-3-Clause"
+homepage: "https://github.com/chebfun/chebfun"
+repository: "https://github.com/chebfun/chebfun"
+dependencies: []
+
+paths:
+  - path: "."
+
+# Optional dirs, opt in with `mip load chebfun --with <group>`:
+#   tests  - the regression suite (one subdir per class, so add recursively).
+#   demos  - the chebgui demo .guifile collection. chebgui.demo() already finds
+#            these relative to chebfunroot() once shipped; --with demos also puts
+#            the folder on the path.
+extra_paths:
+  tests:
+    - path: "tests"
+      recursive: true
+  demos:
+    - path: "chebguiDemos"
+
+builds:
+  - architectures: [any]
+    test_script: test_chebfun.m
