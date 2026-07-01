@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added `surfacefun@master` (Dan Fortunato's high-order surface-PDE package;
+  pure MATLAB, `any` architecture). Depends on `chebfun` (declared as a mip
+  dependency, replacing the upstream `external/chebfun` git submodule);
+  `docs/` (~24 MB of Sphinx sources) is trimmed. `demo/` and `apps/` ship as
+  the `examples` extra-paths group. Upstream has no formal license file;
+  carried as `license: unspecified` (intentionally permissive) per channel
+  owner's direction.
+
 - Add `sdpt3@master` (numbl_wasm) and `tfocs@1.4.1` (MEX linux/macos + `any`
   fallback), ported from an older packaging system. Renamed each `recipe.yaml`
   to `source.yaml`; dropped the obsolete `symbol_extensions` field from
