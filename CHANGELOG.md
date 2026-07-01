@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Add `sdpt3@master` (numbl_wasm) and `tfocs@1.4.1` (MEX linux/macos + `any`
+  fallback), ported from an older packaging system. Renamed each `recipe.yaml`
+  to `source.yaml`; dropped the obsolete `symbol_extensions` field from
+  `sdpt3`'s `mip.yaml`; added `test_tfocs.m` exercising `proxAdaptiveL1Mex`
+  (the MEX-coverage gate rejects a built-but-unexercised MEX).
+
 ## 2026-06-30
 
 - `fmm2d` (numbl_wasm): define `flong` (`int64_t`) in `fmm2d_c.h`. fort2c emits
