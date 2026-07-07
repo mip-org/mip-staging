@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added `vtktoolbox@master` (KIT-IBT's MEX interface to VTK: file I/O and
+  filters for VTK datasets as MATLAB structs; MPL-2.0, branch-tracked, no
+  tags). `compile.m` builds a minimal static VTK 9.5.2 from source (19
+  modules, no rendering) in a scratch prefix, then drives the upstream
+  CMakeLists to produce the 29 MEX into `MATLAB/`; Linux gets a patchelf
+  `DT_NEEDED` normalization pass, macOS uses Apple Clang, Windows uses MSVC
+  (VS generator). `test_vtktoolbox.m` functionally exercises all 29 MEX.
+
 - Added `surfacefun@master` (Dan Fortunato's high-order surface-PDE package;
   pure MATLAB, `any` architecture). Depends on `chebfun` (declared as a mip
   dependency, replacing the upstream `external/chebfun` git submodule);

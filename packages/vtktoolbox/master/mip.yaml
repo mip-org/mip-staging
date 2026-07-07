@@ -1,0 +1,35 @@
+name: vtktoolbox
+description: "MEX interface to the VTK library: read/write VTK files and apply VTK filters to VTK datasets in MATLAB."
+version:
+license: "MPL-2.0"
+homepage: "https://github.com/KIT-IBT/vtkToolbox"
+repository: "https://github.com/KIT-IBT/vtkToolbox"
+dependencies: []
+
+# MATLAB/ holds the .m MEX wrappers plus pure-MATLAB helpers and receives the
+# MEX built by compile.m. S2-Sampling-Toolbox (vendored by upstream, MIT) holds
+# the sphere-sampling helpers used by vtkCreateIcosphere.
+paths:
+  - path: "MATLAB"
+  - path: "MATLAB/S2-Sampling-Toolbox"
+
+# vtktoolbox is MEX-only: every vtk* wrapper dispatches into a compiled MEX,
+# so there is no useful pure-MATLAB `any` fallback.
+builds:
+  - architectures: [linux_x86_64, macos_arm64, windows_x86_64]
+    compile_script: compile.m
+    test_script: test_vtktoolbox.m
+    # Per-architecture MEX compiler. macOS uses Apple Clang (VTK's native
+    # macOS toolchain, uniform libc++); Windows uses MSVC (VTK's first-class
+    # Windows compiler, and MATLAB's native Windows MEX ABI — VTK with the
+    # channel's MinGW 8.1 is not supported upstream). Linux is omitted, so it
+    # uses the channel-default gcc (gcc-toolset-10 in the ubi8 container).
+    compiler:
+      macos_arm64: clang
+      windows_x86_64: msvc
+    setup:
+      linux:
+        # The ubi8 container has no cmake; git is needed by the upstream
+        # CMakeLists' FetchContent fallback that fetches header-only Eigen.
+        - "dnf install -y cmake git"
+      # macOS and Windows runners ship cmake (and git) preinstalled.

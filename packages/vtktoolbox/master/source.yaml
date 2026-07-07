@@ -1,0 +1,17 @@
+# Build from the upstream vtkToolbox. The repo has no release tags, so we
+# track the default branch (master); the release-dir name (master) equals
+# source.branch, and mip.yaml carries a blank `version:`. Do NOT add a
+# `version:` field here.
+#
+# The vtk*/ source dirs and libvtkMatlab/ are build inputs (compile.m drives
+# the upstream CMakeLists.txt, which compiles them); MATLAB/ holds the .m
+# wrappers and receives the built MEX. Upstream's pre-built .mex* binaries in
+# MATLAB/ are swept out automatically by the bundler before compile.m runs.
+#
+# remove_dirs trims developer scaffolding that is not a build input: the
+# Xcode project.
+source:
+  git: "https://github.com/KIT-IBT/vtkToolbox"
+  branch: "master"
+  remove_dirs:
+    - vtkToolbox.xcodeproj
