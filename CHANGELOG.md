@@ -9,6 +9,10 @@
   CMakeLists to produce the 29 MEX into `MATLAB/`; Linux gets a patchelf
   `DT_NEEDED` normalization pass, macOS uses Apple Clang, Windows uses MSVC
   (VS generator). `test_vtktoolbox.m` functionally exercises all 29 MEX.
+  Windows builds define `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` (both cmake
+  stages): VTK ParallelCore locks a static `std::mutex` at DLL attach, which
+  faults against MATLAB's older bundled MSVCP140.dll and made
+  `vtkIntegrateAttributes.mexw64` fail to load (same issue/fix as gptoolbox).
 
 - Added `surfacefun@master` (Dan Fortunato's high-order surface-PDE package;
   pure MATLAB, `any` architecture). Depends on `chebfun` (declared as a mip
