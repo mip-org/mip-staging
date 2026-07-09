@@ -1,0 +1,23 @@
+name: safe
+description: "SAFE (Sensitivity Analysis For Everybody): global sensitivity analysis toolbox with EET/Morris, RSA, Sobol'/VBSA, FAST, PAWN, GLUE, and DYNIA methods."
+version: "1.2.0"
+license: "GPL-3.0"
+homepage: "https://safetoolbox.github.io/"
+repository: "https://github.com/SAFEtoolbox/SAFE-matlab"
+dependencies: []
+
+paths:
+  - path: "DYNIA"
+  - path: "EET"
+  - path: "FAST"
+  - path: "GLUE"
+  - path: "PAWN"
+  - path: "RSA"
+  - path: "VBSA"
+  - path: "sampling"
+  - path: "util"
+  - path: "visualization"
+
+builds:
+  - architectures: [any]
+    test_script: test_safe.m

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- Added `safe@1.2.0` (SAFE global sensitivity analysis toolbox from the
+  University of Bristol: EET/Morris, RSA, Sobol'/VBSA, FAST, PAWN, GLUE,
+  DYNIA; GPL-3.0, pure MATLAB, `any` arch). The upstream `example/` dir and
+  the 12 MB `PAWN/SWAT_samples.mat` demo dataset are removed — the latter via
+  the new `remove_files:` field in `source.yaml`, added to
+  `mip_channel_tools` alongside this (build after that lands on tooling
+  `main`). Note SAFE's `AAT_sampling`/`OAT_sampling` need the Statistics and
+  Machine Learning Toolbox at runtime.
+- Added `wec-sim@7.1.0` (WEC-Sim wave energy converter simulator from
+  NREL/Sandia; Apache-2.0, pure MATLAB, `any` arch). `remove_dirs` trims
+  `examples`/`docs`/`tutorials`/`tests` (~650 MB checkout → 8 MB bundle);
+  paths mirror upstream `addWecSimSource.m`, with explicit entries for the
+  Simulink `.slx` library dirs that `recursive` skips. Running simulations
+  requires Simulink/Simscape/Simscape Multibody; `test_wec_sim.m` smoke-tests
+  the pure-MATLAB surface only.
 - Added `vtktoolbox@master` (KIT-IBT's MEX interface to VTK: file I/O and
   filters for VTK datasets as MATLAB structs; MPL-2.0, branch-tracked, no
   tags). `compile.m` builds a minimal static VTK 9.5.2 from source (19
