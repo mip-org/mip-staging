@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added `pivlab@3.12.001` (PIVlab particle image velocimetry tool by William
+  Thielicke; MIT). Compiles 5 MEX from source on the three CI arches
+  (`+plot/fastLICFunction` LIC renderer plus minFunc's
+  mcholC/lbfgsC/lbfgsAddC/lbfgsProdC for wOFV), with an `[any]` pure-MATLAB
+  fallback. Trims `resources/`, `docs/`, `Example_data/`, and the proprietary
+  PCO/Teensy hardware-acquisition binaries. The PIV engine needs the Image
+  Processing Toolbox at runtime (absent on CI), so the channel tests exercise
+  layout, `misc.smoothn`/`misc.inpaint_nans`, and all shipped MEX.
 - Added `safe@1.2.0` (SAFE global sensitivity analysis toolbox from the
   University of Bristol: EET/Morris, RSA, Sobol'/VBSA, FAST, PAWN, GLUE,
   DYNIA; GPL-3.0, pure MATLAB, `any` arch). The upstream `example/` dir and
