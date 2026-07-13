@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added `kwave@1.4.1` (k-Wave acoustic/ultrasound simulation toolbox by Bradley
+  Treeby, Ben Cox, et al., UCL; LGPL-3.0-or-later). Pure MATLAB (`any`), fetched
+  from the upstream `k-Wave/` subdirectory at tag `v1.4.1`. `mip load kwave` is
+  k-Wave's own install step (add the `k-Wave` folder to the path); `info.xml` +
+  `helpfiles/` keep the in-browser docs. `examples/` and `testing/` are opt-in
+  via `--with`. The optional accelerated C++/CUDA solver binaries are not part
+  of the toolbox (users download them from k-wave.org), so there is nothing
+  platform-specific to build. `test_kwave.m` checks core utilities and runs a
+  tiny headless `kspaceFirstOrder2D` initial-value problem in base MATLAB.
 - Added `pivlab@3.12.001` (PIVlab particle image velocimetry tool by William
   Thielicke; MIT). Compiles 5 MEX from source on the three CI arches
   (`+plot/fastLICFunction` LIC renderer plus minFunc's
