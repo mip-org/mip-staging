@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added `safe@main`, branch-tracking rebeccamccabe/SAFE-matlab (upstream
+  `main` plus a one-line fix: `PAWN/pawn_model_execution.m` calls
+  `model_evaluation`, which doesn't exist anywhere in the toolbox — broken in
+  upstream v1.2.0 and `main` alike). Same trims and layout as `safe@1.2.0`;
+  the test additionally exercises `pawn_model_execution` on a generated
+  model, which fails against unpatched upstream. Needed by
+  symbiotic-engineering/MDOcean (PR #299), whose old SAFE submodule pointed
+  at this fork; bare `safe` still resolves to `1.2.0`, so pin `safe@main`.
 - Added `kwave@1.4.1` (k-Wave acoustic/ultrasound simulation toolbox by Bradley
   Treeby, Ben Cox, et al., UCL; LGPL-3.0-or-later). Pure MATLAB (`any`), fetched
   from the upstream `k-Wave/` subdirectory at tag `v1.4.1`. `mip load kwave` is

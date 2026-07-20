@@ -1,0 +1,9 @@
+source:
+  git: "https://github.com/rebeccamccabe/SAFE-matlab"
+  branch: "main"
+  # Same trims as safe/1.2.0: demo models (hymod, hbv, ...) and their data
+  # files, used only by the workflow_*.m scripts; not part of the library.
+  # SWAT_samples.mat is a 12 MB demo dataset for
+  # workflow_pawn_givendata_swat.m.
+  remove_dirs: [example]
+  remove_files: [PAWN/SWAT_samples.mat]
