@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added `librla@1.1.1` (randomized linear algebra library by Adrianna Gillman
+  and Zydrunas Gimbutas; MIT; arXiv:2607.20732). Pure MATLAB (`any`), fetched
+  from the upstream `distrib/matlab/` subdirectory at tag `v1.1.1` — the
+  Python and Julia implementations are not shipped. Provides sketching-based
+  low-rank QR/SVD/ID with tolerance and rank modes, a deterministic ID, and a
+  matrix-free `LinearOperator` class. Upstream `demo/` and `test/` are opt-in
+  via `--with examples` / `--with tests`. `test_librla.m` exercises all five
+  public routines against a full-SVD reference plus the LinearOperator path.
 - Added `safe@main`, branch-tracking rebeccamccabe/SAFE-matlab (upstream
   `main` plus a one-line fix: `PAWN/pawn_model_execution.m` calls
   `model_evaluation`, which doesn't exist anywhere in the toolbox — broken in
