@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Removed stale copies of `fmm2d@main`, `finufft@2.5.1`, and `fmm3d@master`:
+  all three graduated to mip-org/mip-core, where fmm2d and finufft have since
+  been improved directly (staging held outdated ancestors) and fmm3d's
+  `version:` was corrected. The `fmm2d-main` and `finufft-2.5.1` GitHub
+  releases and tags were deleted, and the recipe-folder filter drops them
+  from the index on reassembly. `fmm3d@master` never published here — its
+  invalid `version: "master"` failed every build and nightly probe since
+  2026-06-30 — so it had no release to delete.
 - Added `pivlab@3.14` (upstream tag `3.14`; `3.12.001` remains available).
   Nine MEX from source on the three CI arches with an `[any]` fallback: the
   five carried over from 3.12.001 plus 3.14's new `+opencv` camera
