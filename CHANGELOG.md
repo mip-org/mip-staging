@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- Added `pivlab@3.14` (upstream tag `3.14`; `3.12.001` remains available).
+  Nine MEX from source on the three CI arches with an `[any]` fallback: the
+  five carried over from 3.12.001 plus 3.14's new `+opencv` camera
+  calibration / tilted-model undistortion MEX, statically linked against
+  OpenCV 4.x (core+imgproc+calib3d) acquired per-platform in the gptoolbox
+  style — brew `opencv@4` bottle on macOS (clang; TBB left dynamic, MATLAB
+  ships oneTBB and resolves it), pinned minimal 4.13.0 source build on Linux,
+  vcpkg `opencv4[core,calib3d,imgproc]` static-md on Windows (MSVC; upstream
+  PIVlab's own recipe — its prebuilt Windows binaries are stripped and
+  rebuilt). Same trims as before plus the stray byte-identical
+  `+wOFV/OptimizationSolvers` duplicate. Adapted to 3.14's API changes:
+  `piv.piv_FFTmulti` now takes name-value arguments (`example.m` rewritten)
+  and `piv.piv_analysis` was removed upstream (layout check asserts
+  `piv.piv_FFTensemble` instead). `test_pivlab_mex.m` exercises all nine MEX,
+  the OpenCV ones via synthetic pinhole-camera calibration and undistortion
+  checks.
 - Replaced `librla@1.1.1` with `librla@1.2.0`: upstream deleted the `v1.1.1`
   tag days after we shipped it (leaving the recipe unrebuildable) and released
   `v1.2.0`, which properly bumps the internal version headers, adds dense

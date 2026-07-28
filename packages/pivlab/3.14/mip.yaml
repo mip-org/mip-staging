@@ -1,0 +1,56 @@
+name: pivlab
+description: "PIVlab: particle image velocimetry (PIV) tool with GUI - image preprocessing, FFT-based PIV analysis, wavelet-based optical flow velocimetry (wOFV), postprocessing, and visualization."
+version: "3.14"
+license: "MIT"
+homepage: "https://www.pivlab.de"
+repository: "https://github.com/Shrediquette/PIVlab"
+dependencies: []
+
+# The package root holds PIVlab_GUI.m plus the +piv/+preproc/+postproc/...
+# namespaces (auto-discovered). images/, help/ and PIVlab_capture_resources/
+# mirror the addpath calls PIVlab_GUI.m makes at startup. The minFunc dirs
+# replace upstream's runtime `addpath(genpath('OptimizationSolvers'))`, which
+# only works when the current folder is the PIVlab root.
+paths:
+  - path: "."
+  - path: "images"
+  - path: "help"
+  - path: "PIVlab_capture_resources"
+  - path: "OptimizationSolvers/minFunc"
+  - path: "OptimizationSolvers/minFunc/minFunc"
+  - path: "OptimizationSolvers/minFunc/minFunc/compiled"
+
+# Opt in with `mip load pivlab --with examples` / `--with tests`.
+extra_paths:
+  examples:
+    - path: "Example_scripts"
+  tests:
+    - path: "unittests"
+
+builds:
+  - architectures: [linux_x86_64, macos_arm64, windows_x86_64]
+    compile_script: compile.m
+    test_script: test_pivlab_mex.m
+    # The +opencv MEX are C++ against OpenCV 4.x. macOS uses Apple Clang
+    # (uniform libc++, links the static brew bottle); Windows uses MSVC
+    # (MATLAB's native Windows compiler, matches the static-md vcpkg
+    # triplet). Linux is omitted, so it keeps the channel-default gcc.
+    compiler:
+      macos_arm64: clang
+      windows_x86_64: msvc
+    # OpenCV acquisition is per-platform (the gptoolbox pattern): brew's
+    # keg-only opencv@4 bottle on macOS (static .a, built for the pinned
+    # macos-14 runner so its minos matches the channel floor); vcpkg
+    # static-md on Windows (upstream PIVlab's own documented build; the
+    # channel applies its overlay triplets via VCPKG_OVERLAY_TRIPLETS);
+    # Linux has no prebuilt static OpenCV for glibc 2.28, so compile.m
+    # builds a pinned minimal 4.13.0 from source (needs cmake/make).
+    setup:
+      macos:
+        - "brew install opencv@4"
+      linux:
+        - "dnf install -y cmake make"
+      windows:
+        - 'vcpkg install "opencv4[core,calib3d,imgproc]:x64-windows-static-md"'
+  - architectures: [any]
+    test_script: test_pivlab.m
