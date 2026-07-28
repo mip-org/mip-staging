@@ -3,7 +3,7 @@
 % Exercises the public API: the four randomized sketching routines
 % (orth_sketch, qr_sketch, svd_sketch, id_sketch) in tolerance mode, the
 % deterministic id_qrpiv, rank mode, and the matrix-free LinearOperator
-% interface.
+% interface in both rank and tolerance mode.
 rng('default');
 
 % Ill-conditioned Hilbert-type matrix with rapidly decaying singular values.
@@ -47,5 +47,12 @@ Aop = LinearOperator(@(x) A * x, @(x) A' * x, size(A, 1), size(A, 2));
 assert(isequal(size(Aop), size(A)), 'LinearOperator reports the wrong size');
 [~, so, ~] = librla.svd_sketch(Aop, r);
 assert(max(abs(so - sfull(1:r))) < 1e-8 * nrmA, 'matrix-free svd_sketch singular values are inaccurate');
+
+fprintf('Testing matrix-free tolerance mode...\n');
+[Ut, st, Vt] = librla.svd_sketch(Aop, rtol);
+assert(norm(A - Ut * diag(st) * Vt') < 1e-8 * nrmA, ...
+    'matrix-free tolerance-mode svd_sketch reconstruction error too large');
+assert(max(abs(st - sfull(1:numel(st)))) < 1e-8 * nrmA, ...
+    'matrix-free tolerance-mode svd_sketch singular values are inaccurate');
 
 fprintf('SUCCESS\n');

@@ -11,7 +11,7 @@ takes either a relative tolerance (`rtol < 1`, adaptive rank) or a target
 rank (`rtol >= 1`), and handles real and complex matrices. The library is
 described in [arXiv:2607.20732](https://arxiv.org/abs/2607.20732).
 
-- Upstream: <https://github.com/agillman20/librla>, tag `v1.1.1`
+- Upstream: <https://github.com/agillman20/librla>, tag `v1.2.0`
 - License: MIT (the upstream `DISCLAIMER.txt` with NIST's standard
   no-warranty disclaimer ships alongside)
 
@@ -41,4 +41,5 @@ off the path by default:
 
 `test_librla.m` runs on the `any` build and exercises all five public
 routines on an ill-conditioned Hilbert-type matrix — tolerance mode against
-a full SVD reference, rank mode, and the matrix-free `LinearOperator` path.
+a full-SVD reference, rank mode, and the matrix-free `LinearOperator` path
+in both rank and tolerance mode.

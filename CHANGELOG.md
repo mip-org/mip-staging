@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Replaced `librla@1.1.1` with `librla@1.2.0`: upstream deleted the `v1.1.1`
+  tag days after we shipped it (leaving the recipe unrebuildable) and released
+  `v1.2.0`, which properly bumps the internal version headers, adds dense
+  materialization in `get_matrix`, and lifts the rank-mode-only restriction on
+  matrix-free `LinearOperator`s. Same recipe otherwise; the test now also
+  covers matrix-free tolerance mode. The `librla-1.1.1` GitHub release
+  remains as an orphan (its `.mhl` was built from the same history).
 - Added `librla@1.1.1` (randomized linear algebra library by Adrianna Gillman
   and Zydrunas Gimbutas; MIT; arXiv:2607.20732). Pure MATLAB (`any`), fetched
   from the upstream `distrib/matlab/` subdirectory at tag `v1.1.1` — the
