@@ -139,7 +139,10 @@ elseif isunix
     end
     opencv_libs = arrayfun(@(d) fullfile(d.folder, d.name), ...
         [world; third]', 'UniformOutput', false);
-    opencv_flags = {'LDFLAGS=$LDFLAGS -lpthread -ldl -lrt'};
+    % Bare mex args, not LDFLAGS: mex puts LDFLAGS before the archives on
+    % the link line, and GNU ld resolves left to right, so -ldl there leaves
+    % libopencv_world's dlopen/dlsym references undefined.
+    opencv_flags = {'-lpthread', '-ldl', '-lrt'};
 else
     % vcpkg static-md install from mip.yaml setup. Mirrors upstream's
     % +opencv/build_opencv_mex.m: static archives carry no transitive dep
