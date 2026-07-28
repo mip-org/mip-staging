@@ -87,12 +87,13 @@ elseif isunix
     % Pinned minimal static build: core+imgproc+calib3d (BUILD_LIST resolves
     % features2d/flann automatically), merged into one libopencv_world.a,
     % bundled static zlib, PIC (the .a links into the MEX .so), no IPP/
-    % OpenCL/LAPACK/codecs/media. imgcodecs is in the list only because the
-    % world module's CMakeLists unconditionally calls
-    % ocv_imgcodecs_configure_target (4.13.0 quirk); with every external
-    % codec OFF it adds just the built-in BMP/PXM readers. CPU baseline is
-    % OpenCV's portable default (SSE3) with runtime dispatch -- no
-    % -march=native hazard.
+    % OpenCL/LAPACK/codecs/media. 4.13.0 quirk: BUILD_LIST-excluded modules
+    % are still marked IS_PART_OF_WORLD, so the world CMakeLists calls their
+    % configure hooks without their functions being defined. Exactly two
+    % hooks exist: imgcodecs (in the list, so its function is defined; with
+    % every codec OFF it adds just built-in BMP/PXM readers) and highgui
+    % (forced OFF so its guard is false). CPU baseline is OpenCV's portable
+    % default (SSE3) with runtime dispatch -- no -march=native hazard.
     url = 'https://github.com/opencv/opencv/archive/refs/tags/4.13.0.tar.gz';
     sha256 = '1d40ca017ea51c533cf9fd5cbde5b5fe7ae248291ddf2af99d4c17cf8e13017d';
     workdir = tempname; mkdir(workdir);
@@ -112,6 +113,7 @@ elseif isunix
     cfg = sprintf(['cmake -S "%s" -B "%s" -DCMAKE_BUILD_TYPE=Release ' ...
         '-DCMAKE_INSTALL_PREFIX="%s" -DBUILD_SHARED_LIBS=OFF ' ...
         '-DBUILD_LIST=core,imgproc,calib3d,imgcodecs -DBUILD_opencv_world=ON ' ...
+        '-DBUILD_opencv_highgui=OFF ' ...
         '-DBUILD_ZLIB=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON ' ...
         '-DWITH_IPP=OFF -DWITH_ITT=OFF -DWITH_OPENCL=OFF -DWITH_LAPACK=OFF ' ...
         '-DWITH_EIGEN=OFF -DWITH_PNG=OFF -DWITH_JPEG=OFF -DWITH_TIFF=OFF ' ...
