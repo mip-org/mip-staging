@@ -78,14 +78,21 @@ if ismac
         error('brew --prefix tbb failed -- opencv@4 should have pulled it in');
     end
     tbbPrefix = strtrim(tbbPrefix);
+    % The channel clang++.xml sets no -std; the runner's default is pre-C++11
+    % and OpenCV 4.x headers refuse anything older than C++11.
     opencv_flags = {['-L' fullfile(tbbPrefix, 'lib')], '-ltbb', '-lz', ...
+        'CXXFLAGS=$CXXFLAGS -std=c++17', ...
         'LDFLAGS=$LDFLAGS -framework OpenCL -framework Accelerate -framework Foundation'};
 elseif isunix
     % Pinned minimal static build: core+imgproc+calib3d (BUILD_LIST resolves
     % features2d/flann automatically), merged into one libopencv_world.a,
     % bundled static zlib, PIC (the .a links into the MEX .so), no IPP/
-    % OpenCL/LAPACK/codecs/media. CPU baseline is OpenCV's portable default
-    % (SSE3) with runtime dispatch -- no -march=native hazard.
+    % OpenCL/LAPACK/codecs/media. imgcodecs is in the list only because the
+    % world module's CMakeLists unconditionally calls
+    % ocv_imgcodecs_configure_target (4.13.0 quirk); with every external
+    % codec OFF it adds just the built-in BMP/PXM readers. CPU baseline is
+    % OpenCV's portable default (SSE3) with runtime dispatch -- no
+    % -march=native hazard.
     url = 'https://github.com/opencv/opencv/archive/refs/tags/4.13.0.tar.gz';
     sha256 = '1d40ca017ea51c533cf9fd5cbde5b5fe7ae248291ddf2af99d4c17cf8e13017d';
     workdir = tempname; mkdir(workdir);
@@ -104,7 +111,7 @@ elseif isunix
     nproc = feature('numcores');
     cfg = sprintf(['cmake -S "%s" -B "%s" -DCMAKE_BUILD_TYPE=Release ' ...
         '-DCMAKE_INSTALL_PREFIX="%s" -DBUILD_SHARED_LIBS=OFF ' ...
-        '-DBUILD_LIST=core,imgproc,calib3d -DBUILD_opencv_world=ON ' ...
+        '-DBUILD_LIST=core,imgproc,calib3d,imgcodecs -DBUILD_opencv_world=ON ' ...
         '-DBUILD_ZLIB=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON ' ...
         '-DWITH_IPP=OFF -DWITH_ITT=OFF -DWITH_OPENCL=OFF -DWITH_LAPACK=OFF ' ...
         '-DWITH_EIGEN=OFF -DWITH_PNG=OFF -DWITH_JPEG=OFF -DWITH_TIFF=OFF ' ...

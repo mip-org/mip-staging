@@ -51,6 +51,10 @@ builds:
       linux:
         - "dnf install -y cmake make"
       windows:
-        - 'vcpkg install "opencv4[core,calib3d,imgproc]:x64-windows-static-md"'
+        # No imgproc feature exists -- it is part of the base build; calib3d
+        # pulls features2d/flann. (upstream's build_opencv_mex.m names
+        # imgproc, but the port rejects it: "opencv4 has no feature named
+        # imgproc".)
+        - 'vcpkg install "opencv4[core,calib3d]:x64-windows-static-md"'
   - architectures: [any]
     test_script: test_pivlab.m
