@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Pointed the five tooling shims still pinned to `mip_channel_tools@staging`
+  (build-request, push-build, scheduled-build, download-stats,
+  assemble-index) at `@main`, matching build-package. The `staging` branch
+  had no commits of its own and was 28 behind `main`, so probing, indexing,
+  and stats ran without months of fixes (Windows source-hash normalization,
+  UTF-8 `.mip.json`).
 - Removed stale copies of `fmm2d@main`, `finufft@2.5.1`, and `fmm3d@master`:
   all three graduated to mip-org/mip-core, where fmm2d and finufft have since
   been improved directly (staging held outdated ancestors) and fmm3d's

@@ -20,5 +20,5 @@ concurrency:
 
 jobs:
   probe-and-dispatch:
-    uses: mip-org/mip_channel_tools/.github/workflows/scheduled-build.yml@staging
+    uses: mip-org/mip_channel_tools/.github/workflows/scheduled-build.yml@main
     secrets: inherit
