@@ -21,5 +21,5 @@ concurrency:
 
 jobs:
   download-stats:
-    uses: mip-org/mip_channel_tools/.github/workflows/download-stats.yml@staging
+    uses: mip-org/mip_channel_tools/.github/workflows/download-stats.yml@main
     secrets: inherit

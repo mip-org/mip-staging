@@ -15,5 +15,5 @@ permissions:
 
 jobs:
   dispatch:
-    uses: mip-org/mip_channel_tools/.github/workflows/push-build.yml@staging
+    uses: mip-org/mip_channel_tools/.github/workflows/push-build.yml@main
     secrets: inherit

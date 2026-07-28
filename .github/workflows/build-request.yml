@@ -19,5 +19,5 @@ permissions:
 
 jobs:
   build-request:
-    uses: mip-org/mip_channel_tools/.github/workflows/build-request.yml@staging
+    uses: mip-org/mip_channel_tools/.github/workflows/build-request.yml@main
     secrets: inherit
