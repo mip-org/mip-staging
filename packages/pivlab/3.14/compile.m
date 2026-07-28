@@ -157,7 +157,10 @@ else
     end
     opencv_libs = arrayfun(@(d) fullfile(d.folder, d.name), libfiles', ...
         'UniformOutput', false);
-    opencv_flags = {};
+    % Same define the overlay triplet applies to the OpenCV build (see
+    % vcpkg-triplets/): keep any header-inlined static mutex in the MEX's own
+    % objects loadable against MATLAB's pre-14.40 msvcp140.dll.
+    opencv_flags = {'COMPFLAGS=$COMPFLAGS /D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR'};
 end
 
 if ~exist(fullfile(opencv_inc, 'opencv2', 'core.hpp'), 'file')

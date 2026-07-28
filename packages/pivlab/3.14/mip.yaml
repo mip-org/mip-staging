@@ -54,7 +54,12 @@ builds:
         # No imgproc feature exists -- it is part of the base build; calib3d
         # pulls features2d/flann. (upstream's build_opencv_mex.m names
         # imgproc, but the port rejects it: "opencv4 has no feature named
-        # imgproc".)
-        - 'vcpkg install "opencv4[core,calib3d]:x64-windows-static-md"'
+        # imgproc".) The package-local overlay triplet (see
+        # vcpkg-triplets/x64-windows-static-md.cmake) adds
+        # _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR so the static OpenCV loads
+        # against MATLAB's pre-14.40 msvcp140.dll; the CLI flag shadows the
+        # channel triplet dir from VCPKG_OVERLAY_TRIPLETS. Runs from the
+        # channel checkout root, so the packages/ path is stable.
+        - 'vcpkg install --overlay-triplets=packages/pivlab/3.14/vcpkg-triplets "opencv4[core,calib3d]:x64-windows-static-md"'
   - architectures: [any]
     test_script: test_pivlab.m
