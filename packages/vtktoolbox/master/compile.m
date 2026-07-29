@@ -102,7 +102,29 @@ vtkPrefix = fullfile(work, 'vtk-install');
 genArg = '';
 osArgs = '';
 if ispc
-    genArg = ' -G "Visual Studio 17 2022" -A x64';
+    % -T version=14.29 pins the v142 toolset (MSVC 14.29) instead of whatever
+    % the runner's VS2022 ships (14.44+ today). This is the Windows analogue of
+    % the Linux glibc-2.28 floor and the macOS deployment target: build against
+    % the OLDEST runtime we support so the MEX loads everywhere, rather than
+    % against the newest the build box happens to have.
+    %
+    % Concretely, MATLAB loads MSVCP140.dll from its own bin\win64 ahead of
+    % anything else, and R2023a (the channel's Windows floor) bundles 14.29.
+    % A 14.44-built MEX whose static init touches the iostream/locale
+    % machinery faults there: vtkIntegrateAttributes -- the only MEX linking
+    % VTK ParallelCore, which drags in ~57 extra MSVCP140 imports
+    % (basic_istream/codecvt/ctype/locale::_Init/_Lockit, plus imported data
+    % symbols) -- failed every Windows build with "A dynamic link library
+    % (DLL) initialization routine failed". Verified on a real R2023a install:
+    % the shipped binary fails to load as the FIRST mex in a fresh session,
+    % while the SAME binary loads fine under R2026a (which bundles 14.44).
+    % (_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR was tried first and does NOT fix
+    % this; it addresses only std::mutex's constexpr constructor.)
+    % Building at 14.29 is forward-compatible -- such a MEX still loads on
+    % newer MATLAB. v142 ships on the pinned windows-2022 image
+    % (Microsoft.VisualStudio.ComponentGroup.VC.Tools.142.x86.x64) and
+    % supports the C++17 VTK 9.5 requires.
+    genArg = ' -G "Visual Studio 17 2022" -A x64 -T version=14.29';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...

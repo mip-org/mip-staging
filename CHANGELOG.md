@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- `vtktoolbox@master`: pin the Windows CMake toolset to v142 (MSVC 14.29) with
+  `-T version=14.29`, fixing the `vtkIntegrateAttributes.mexw64` DLL-init
+  failure that had made **every** Windows build fail since the package landed
+  (24 builds, 0 green). Root cause is a runtime-version mismatch, not the
+  `std::mutex` issue previously blamed: the runner builds with MSVC 14.44,
+  MATLAB loads its own bundled `MSVCP140.dll` first, and R2023a (the channel's
+  Windows floor) bundles 14.29. `vtkIntegrateAttributes` is the only MEX
+  linking VTK ParallelCore, which pulls in ~57 extra MSVCP140 imports — the
+  iostream/locale/codecvt machinery that initializes at DLL attach — so it is
+  the only one that faults. Verified on a real R2023a install: the shipped
+  binary fails as the first MEX in a fresh session, while the same binary
+  loads fine under R2026a (which bundles 14.44). Building at 14.29 is
+  forward-compatible. This gives Windows the oldest-supported-runtime floor
+  that Linux (glibc 2.28) and macOS (deployment target) already have.
 - `vtktoolbox@master`: dropped its per-package
   `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` CMake flag; mip_channel_tools'
   `build-package.yml` now sets it globally for every Windows build. Behavior
@@ -111,6 +125,8 @@
   stages): VTK ParallelCore locks a static `std::mutex` at DLL attach, which
   faults against MATLAB's older bundled MSVCP140.dll and made
   `vtkIntegrateAttributes.mexw64` fail to load (same issue/fix as gptoolbox).
+  (Superseded — that define did **not** fix it and Windows never went green;
+  see the `-T version=14.29` entry above for the real cause and fix.)
 
 - Added `surfacefun@master` (Dan Fortunato's high-order surface-PDE package;
   pure MATLAB, `any` architecture). Depends on `chebfun` (declared as a mip
