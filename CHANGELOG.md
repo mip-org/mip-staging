@@ -10,10 +10,10 @@
   `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` is in the channel-shared
   `x64-windows-static-md` triplet (mip_channel_tools). `vcpkg install` no
   longer needs `--overlay-triplets`; `VCPKG_OVERLAY_TRIPLETS` already points
-  at the shared one. The mex-side `/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR`
-  on the four `+opencv` MEX stays — it covers pivlab's own compile, a
-  different build step the triplet doesn't reach (same reasoning as
-  gptoolbox's and vtktoolbox's own defines).
+  at the shared one. Also dropped the mex-side
+  `/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` on the four `+opencv` MEX; that's
+  now covered by `build-package.yml` setting `CL` globally for every Windows
+  build. Behavior unchanged.
 - Pointed the five tooling shims still pinned to `mip_channel_tools@staging`
   (build-request, push-build, scheduled-build, download-stats,
   assemble-index) at `@main`, matching build-package. The `staging` branch
