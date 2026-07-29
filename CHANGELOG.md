@@ -2,20 +2,27 @@
 
 ## Unreleased
 
-- `vtktoolbox@master`: pin the Windows CMake toolset to v142 (MSVC 14.29) with
-  `-T v142`, fixing the `vtkIntegrateAttributes.mexw64` DLL-init
+- `vtktoolbox@master`: fixed the `vtkIntegrateAttributes.mexw64` DLL-init
   failure that had made **every** Windows build fail since the package landed
-  (24 builds, 0 green). Root cause is a runtime-version mismatch, not the
-  `std::mutex` issue previously blamed: the runner builds with MSVC 14.44,
-  MATLAB loads its own bundled `MSVCP140.dll` first, and R2023a (the channel's
-  Windows floor) bundles 14.29. `vtkIntegrateAttributes` is the only MEX
-  linking VTK ParallelCore, which pulls in ~57 extra MSVCP140 imports — the
-  iostream/locale/codecvt machinery that initializes at DLL attach — so it is
-  the only one that faults. Verified on a real R2023a install: the shipped
-  binary fails as the first MEX in a fresh session, while the same binary
-  loads fine under R2026a (which bundles 14.44). Building at 14.29 is
-  forward-compatible. This gives Windows the oldest-supported-runtime floor
-  that Linux (glibc 2.28) and macOS (deployment target) already have.
+  (24 builds, 0 green) by patching a static-initialization-order bug in VTK.
+  `vtkOutputWindow.cxx` declares `static std::mutex InstanceLock` at file
+  scope; a static initializer elsewhere in the link calls
+  `vtkOutputWindow::GetInstance()`, which locks it before its own dynamic
+  initializer has run, so the mutex is still zeroed `.bss` — undefined
+  behavior. MSVC 14.40+ tolerates a zero-initialized mutex (the tolerance
+  that makes constexpr mutex constructors legal), but 14.29 reads a null out
+  of it and faults, and MATLAB loads `MSVCP140.dll` from its own `bin\win64`
+  first — R2023a, the channel's Windows floor, bundles 14.29. Only
+  `vtkIntegrateAttributes` links VTK ParallelCore, whose init order trips it.
+  Debugger-confirmed on a real R2023a install: access violation at
+  `MSVCP140!mtx_do_lock` reading address 0 under `ucrtbase!initterm`; the same
+  binary loads fine on R2026a (14.44). `compile.m` now rewrites those statics
+  into function-local statics (initialized on first use, no cross-TU ordering
+  dependency) — the idiom VTK itself uses in `vtkInformationKeyLookup` — and
+  errors out if the expected source text ever changes. Reported upstream.
+  Note this was **not** a toolset or `/MD`-vs-`/MT` issue: a `-T v142` build
+  (14.29 compiler) failed identically, which is what proved it was init order
+  rather than codegen; that pin is reverted here.
 - `vtktoolbox@master`: dropped its per-package
   `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` CMake flag; mip_channel_tools'
   `build-package.yml` now sets it globally for every Windows build. Behavior

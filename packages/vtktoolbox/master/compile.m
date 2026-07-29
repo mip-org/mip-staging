@@ -94,6 +94,8 @@ if ~isfolder(vtkSrc)
 end
 delete(tarball);
 
+patch_output_window_static_init(vtkSrc);
+
 % ---- 2. Build and install a minimal static VTK --------------------------
 vtkBuild = fullfile(work, 'vtk-build');
 vtkPrefix = fullfile(work, 'vtk-install');
@@ -102,36 +104,7 @@ vtkPrefix = fullfile(work, 'vtk-install');
 genArg = '';
 osArgs = '';
 if ispc
-    % -T v142 pins the v142 toolset (MSVC 14.29) instead of whatever
-    % the runner's VS2022 ships (14.44+ today). This is the Windows analogue of
-    % the Linux glibc-2.28 floor and the macOS deployment target: build against
-    % the OLDEST runtime we support so the MEX loads everywhere, rather than
-    % against the newest the build box happens to have.
-    %
-    % Concretely, MATLAB loads MSVCP140.dll from its own bin\win64 ahead of
-    % anything else, and R2023a (the channel's Windows floor) bundles 14.29.
-    % A 14.44-built MEX whose static init touches the iostream/locale
-    % machinery faults there: vtkIntegrateAttributes -- the only MEX linking
-    % VTK ParallelCore, which drags in ~57 extra MSVCP140 imports
-    % (basic_istream/codecvt/ctype/locale::_Init/_Lockit, plus imported data
-    % symbols) -- failed every Windows build with "A dynamic link library
-    % (DLL) initialization routine failed". Verified on a real R2023a install:
-    % the shipped binary fails to load as the FIRST mex in a fresh session,
-    % while the SAME binary loads fine under R2026a (which bundles 14.44).
-    % (_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR was tried first and does NOT fix
-    % this; it addresses only std::mutex's constexpr constructor.)
-    % Building at 14.29 is forward-compatible -- such a MEX still loads on
-    % newer MATLAB. v142 ships on the pinned windows-2022 image
-    % (Microsoft.VisualStudio.ComponentGroup.VC.Tools.142.x86.x64) and
-    % supports the C++17 VTK 9.5 requires.
-    % Log the toolsets actually present: if v142 is ever missing from the
-    % runner image, the cmake configure below fails with a bare "toolset not
-    % found" and this list is what tells you why.
-    [~, tsList] = system(['powershell -NoProfile -Command "Get-ChildItem ' ...
-        '-Directory ''C:\Program Files\Microsoft Visual Studio\2022\*\VC\Tools\MSVC'' ' ...
-        '| Select-Object -ExpandProperty Name"']);
-    fprintf('Installed MSVC toolsets:\n%s\n', strtrim(tsList));
-    genArg = ' -G "Visual Studio 17 2022" -A x64 -T v142';
+    genArg = ' -G "Visual Studio 17 2022" -A x64';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...
@@ -260,6 +233,80 @@ end
 
 fprintf('Built %d MEX files.\n', numel(expectedMex));
 fprintf('=== vtkToolbox MEX compilation complete ===\n');
+
+
+function patch_output_window_static_init(vtkSrc)
+%PATCH_OUTPUT_WINDOW_STATIC_INIT  Make vtkOutputWindow's statics order-safe.
+%
+% vtkOutputWindow.cxx declares two file-scope statics:
+%
+%   static std::mutex InstanceLock;
+%   static vtkSmartPointer<vtkOutputWindow> vtkOutputWindowGlobalInstance;
+%
+% vtkOutputWindow::GetInstance() locks InstanceLock, and a static initializer
+% elsewhere in the link calls GetInstance() -- so on some link orders the
+% mutex is locked BEFORE its own dynamic initializer has run. That is
+% undefined behavior; concretely the mutex is still zeroed .bss.
+%
+% MSVC's runtime is where it bites. 14.40+ tolerates a zero-initialized mutex
+% (that tolerance is what makes constexpr mutex constructors legal), but
+% 14.29 reads a null pointer out of it and faults. MATLAB loads MSVCP140.dll
+% from its own bin\win64 ahead of anything else, and R2023a -- the channel's
+% Windows floor -- bundles 14.29. Result: vtkIntegrateAttributes.mexw64 (the
+% only MEX linking VTK ParallelCore, whose init order trips this) failed to
+% load on every Windows build with "A dynamic link library (DLL)
+% initialization routine failed", while loading fine on R2026a (14.44).
+% Debugger-confirmed: access violation at MSVCP140!mtx_do_lock reading
+% address 0, under ucrtbase!initterm.
+%
+% Fix: move both statics into function-local statics, which C++11 initializes
+% on first use, thread-safely, with no cross-translation-unit ordering
+% dependency. Same idiom VTK already uses in vtkInformationKeyLookup ("Using
+% a static function / variable here to ensure static initialization"). The
+% #defines keep all ~15 existing call sites in the file unchanged. Applied on
+% every platform: the UB is real everywhere, it just happens to be harmless
+% against glibc/libc++ where a zeroed pthread mutex is already valid.
+%
+% Reported upstream; drop this when VTK ships a fix. Errors out rather than
+% silently no-op'ing if the expected text is gone, so a VTK version bump
+% cannot quietly lose the patch.
+file = fullfile(vtkSrc, 'Common', 'Core', 'vtkOutputWindow.cxx');
+if ~isfile(file)
+    error('patch: %s not found', file);
+end
+old = [ ...
+    'static std::mutex InstanceLock; // XXX(c++17): use a `shared_mutex`' newline ...
+    'static vtkSmartPointer<vtkOutputWindow> vtkOutputWindowGlobalInstance;'];
+new = [ ...
+    '// mip: function-local statics -- see patch_output_window_static_init' newline ...
+    'static std::mutex& vtkOutputWindowInstanceLockRef()' newline ...
+    '{' newline ...
+    '  static std::mutex mtx;' newline ...
+    '  return mtx;' newline ...
+    '}' newline ...
+    'static vtkSmartPointer<vtkOutputWindow>& vtkOutputWindowGlobalInstanceRef()' newline ...
+    '{' newline ...
+    '  static vtkSmartPointer<vtkOutputWindow> inst;' newline ...
+    '  return inst;' newline ...
+    '}' newline ...
+    '#define InstanceLock vtkOutputWindowInstanceLockRef()' newline ...
+    '#define vtkOutputWindowGlobalInstance vtkOutputWindowGlobalInstanceRef()'];
+txt = fileread(file);
+if ~contains(txt, old)
+    error(['patch: vtkOutputWindow.cxx no longer contains the expected ' ...
+        'static declarations. VTK %s may have fixed or moved them -- ' ...
+        're-verify the static-init-order fix before dropping this patch.'], ...
+        vtkSrc);
+end
+txt = strrep(txt, old, new);
+fid = fopen(file, 'w');
+if fid < 0
+    error('patch: cannot write %s', file);
+end
+fwrite(fid, txt);
+fclose(fid);
+fprintf('  [patched vtkOutputWindow.cxx: static-init-order fix]\n');
+end
 
 
 function rmdir_silent(d)
