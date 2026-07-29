@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `vtktoolbox@master`: dropped its per-package
+  `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` CMake flag; mip_channel_tools'
+  `build-package.yml` now sets it globally for every Windows build. Behavior
+  unchanged.
 - `pivlab@3.14`: dropped the package-local vcpkg overlay triplet now that
   `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` is in the channel-shared
   `x64-windows-static-md` triplet (mip_channel_tools). `vcpkg install` no

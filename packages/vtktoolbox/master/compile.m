@@ -105,20 +105,8 @@ if ispc
     genArg = ' -G "Visual Studio 17 2022" -A x64';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
-    %
-    % _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR: the MEX are built /MD with the
-    % runner's VS2022 17.10+ toolset, but at load time MSVCP140.dll resolves
-    % to MATLAB's OLDER bundled copy (<matlabroot>\bin\win64), which the host
-    % process searches ahead of System32. 17.10 made std::mutex's default
-    % constructor constexpr; a 17.10+-built mutex run against a pre-17.10
-    % MSVCP140.dll faults in the old lock code (microsoft/STL#4730). VTK's
-    % ParallelCore module (linked only by vtkIntegrateAttributes) locks such
-    % a static mutex during DLL attach, so without this opt-out that MEX
-    % fails to load with "A dynamic link library (DLL) initialization
-    % routine failed". Same fix as gptoolbox; applied to both cmake stages.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...
-        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW' ...
-        ' -DCMAKE_CXX_FLAGS="/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"'];
+        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW'];
 elseif ismac
     % Match the mexopts' minimum-load version (oldest Apple-Silicon macOS) so
     % the static VTK archives don't out-version the MEX.
