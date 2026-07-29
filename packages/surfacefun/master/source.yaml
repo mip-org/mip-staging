@@ -1,3 +1,0 @@
-source:
-  git: "https://github.com/danfortunato/surfacefun"
-  remove_dirs: [docs, external]
