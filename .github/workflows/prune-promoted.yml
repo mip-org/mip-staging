@@ -1,0 +1,42 @@
+name: Prune Promoted Packages
+
+# Thin caller. Daily (and manually runnable), fully retract any package
+# release that has graduated to mip-core: its folder here is byte-identical
+# to the promoted copy on mip-core's main AND mip-core's index lists an .mhl
+# for every architecture it declares. Retraction removes the folder, deletes
+# this repo's GitHub Release for the package, and reassembles the index — so
+# packages/ and the staging channel only advertise what is pending or in
+# progress. Folders that differ from core's copy, that core does not have,
+# or that core has not fully published are never touched. Runs before the
+# 06:00 scheduled-build probe so promoted leftovers are retracted rather
+# than probed (and possibly rebuilt, only to be deleted). The logic lives in
+# the reusable workflow's repo, mip-org/mip_channel_tools; edit the `@ref`
+# on the `uses:` line to run against a different tooling branch.
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only report what would be retracted'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: "prune-promoted"
+  cancel-in-progress: false
+
+jobs:
+  prune-promoted:
+    uses: mip-org/mip_channel_tools/.github/workflows/prune-promoted.yml@main
+    permissions:
+      contents: write
+      actions: write
+    with:
+      channel_repo: mip-org/mip-core
+      dry_run: ${{ inputs.dry_run || false }}
