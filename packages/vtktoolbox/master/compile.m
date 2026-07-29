@@ -102,7 +102,7 @@ vtkPrefix = fullfile(work, 'vtk-install');
 genArg = '';
 osArgs = '';
 if ispc
-    % -T version=14.29 pins the v142 toolset (MSVC 14.29) instead of whatever
+    % -T v142 pins the v142 toolset (MSVC 14.29) instead of whatever
     % the runner's VS2022 ships (14.44+ today). This is the Windows analogue of
     % the Linux glibc-2.28 floor and the macOS deployment target: build against
     % the OLDEST runtime we support so the MEX loads everywhere, rather than
@@ -124,7 +124,14 @@ if ispc
     % newer MATLAB. v142 ships on the pinned windows-2022 image
     % (Microsoft.VisualStudio.ComponentGroup.VC.Tools.142.x86.x64) and
     % supports the C++17 VTK 9.5 requires.
-    genArg = ' -G "Visual Studio 17 2022" -A x64 -T version=14.29';
+    % Log the toolsets actually present: if v142 is ever missing from the
+    % runner image, the cmake configure below fails with a bare "toolset not
+    % found" and this list is what tells you why.
+    [~, tsList] = system(['powershell -NoProfile -Command "Get-ChildItem ' ...
+        '-Directory ''C:\Program Files\Microsoft Visual Studio\2022\*\VC\Tools\MSVC'' ' ...
+        '| Select-Object -ExpandProperty Name"']);
+    fprintf('Installed MSVC toolsets:\n%s\n', strtrim(tsList));
+    genArg = ' -G "Visual Studio 17 2022" -A x64 -T v142';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...

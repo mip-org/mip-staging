@@ -3,7 +3,7 @@
 ## Unreleased
 
 - `vtktoolbox@master`: pin the Windows CMake toolset to v142 (MSVC 14.29) with
-  `-T version=14.29`, fixing the `vtkIntegrateAttributes.mexw64` DLL-init
+  `-T v142`, fixing the `vtkIntegrateAttributes.mexw64` DLL-init
   failure that had made **every** Windows build fail since the package landed
   (24 builds, 0 green). Root cause is a runtime-version mismatch, not the
   `std::mutex` issue previously blamed: the runner builds with MSVC 14.44,
@@ -126,7 +126,7 @@
   faults against MATLAB's older bundled MSVCP140.dll and made
   `vtkIntegrateAttributes.mexw64` fail to load (same issue/fix as gptoolbox).
   (Superseded — that define did **not** fix it and Windows never went green;
-  see the `-T version=14.29` entry above for the real cause and fix.)
+  see the `-T v142` entry above for the real cause and fix.)
 
 - Added `surfacefun@master` (Dan Fortunato's high-order surface-PDE package;
   pure MATLAB, `any` architecture). Depends on `chebfun` (declared as a mip
