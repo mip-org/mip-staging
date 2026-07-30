@@ -107,8 +107,24 @@ if ispc
     genArg = ' -G "Visual Studio 17 2022" -A x64';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
+    %
+    % TEMPORARY DIAGNOSTIC (revert once the culprit is named): /Z7 + /DEBUG so the shipped
+    % vtkIntegrateAttributes.mexw64 has a usable PDB. It fails to load on
+    % MATLAB R2023a with "DLL initialization routine failed" -- an access
+    % violation in MSVCP140!mtx_do_lock under ucrtbase!initterm, i.e. a static
+    % initializer locking a std::mutex that has not been constructed yet. Two
+    % attempts to identify the mutex from the stripped binary's data layout
+    % were wrong, so this build carries symbols to name it outright.
+    %
+    % /Z7 (debug info embedded in each .obj) rather than /Zi (separate
+    % vcNNN.pdb): the VTK build tree is deleted before the toolbox links, so
+    % side-car PDBs would be gone by link time and the MEX's PDB would have no
+    % VTK frames. /Z7 survives into the installed .lib files.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...
-        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW'];
+        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW' ...
+        ' -DCMAKE_C_FLAGS="/Z7" -DCMAKE_CXX_FLAGS="/Z7"' ...
+        ' -DCMAKE_SHARED_LINKER_FLAGS="/DEBUG"' ...
+        ' -DCMAKE_MODULE_LINKER_FLAGS="/DEBUG"'];
 elseif ismac
     % Match the mexopts' minimum-load version (oldest Apple-Silicon macOS) so
     % the static VTK archives don't out-version the MEX.
@@ -197,6 +213,28 @@ end
 if ~isempty(missing)
     error('vtktoolbox:compile', 'MEX missing after build: %s', ...
         strjoin(missing, ', '));
+end
+
+% TEMPORARY DIAGNOSTIC (revert with the /Z7 flags above): keep the PDB for the
+% one MEX that fails to load on R2023a, so its static-init crash can be
+% symbolized from the shipped artifact. Only this one -- 29 PDBs would bloat
+% the bundle. Never fatal: the build must not fail over a diagnostic.
+if ispc
+    pdbName = 'vtkIntegrateAttributes.pdb';
+    dest = fullfile(matlabDir, pdbName);
+    if isfile(dest)
+        d = dir(dest);
+        fprintf('  [diag: %s already in MATLAB/ (%.1f MB)]\n', pdbName, d.bytes/1e6);
+    else
+        found = dir(fullfile(tbBuild, '**', pdbName));
+        if isempty(found)
+            fprintf('  [diag: %s not found under %s]\n', pdbName, tbBuild);
+        else
+            copyfile(fullfile(found(1).folder, found(1).name), dest);
+            fprintf('  [diag: copied %s (%.1f MB) from %s]\n', ...
+                pdbName, found(1).bytes/1e6, found(1).folder);
+        end
+    end
 end
 
 % ---- 5. Linux: normalize DT_NEEDED entries -------------------------------
