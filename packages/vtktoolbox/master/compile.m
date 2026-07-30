@@ -94,7 +94,7 @@ if ~isfolder(vtkSrc)
 end
 delete(tarball);
 
-patch_output_window_static_init(vtkSrc);
+patch_token_manager_lock(vtkSrc);
 
 % ---- 2. Build and install a minimal static VTK --------------------------
 vtkBuild = fullfile(work, 'vtk-build');
@@ -107,24 +107,8 @@ if ispc
     genArg = ' -G "Visual Studio 17 2022" -A x64';
     % /MD (MultiThreadedDLL) is CMake's default and matches MATLAB's ABI; set
     % it explicitly so neither stage can drift to /MT.
-    %
-    % TEMPORARY DIAGNOSTIC (revert once the culprit is named): /Z7 + /DEBUG so the shipped
-    % vtkIntegrateAttributes.mexw64 has a usable PDB. It fails to load on
-    % MATLAB R2023a with "DLL initialization routine failed" -- an access
-    % violation in MSVCP140!mtx_do_lock under ucrtbase!initterm, i.e. a static
-    % initializer locking a std::mutex that has not been constructed yet. Two
-    % attempts to identify the mutex from the stripped binary's data layout
-    % were wrong, so this build carries symbols to name it outright.
-    %
-    % /Z7 (debug info embedded in each .obj) rather than /Zi (separate
-    % vcNNN.pdb): the VTK build tree is deleted before the toolbox links, so
-    % side-car PDBs would be gone by link time and the MEX's PDB would have no
-    % VTK frames. /Z7 survives into the installed .lib files.
     osArgs = [' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' ...
-        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW' ...
-        ' -DCMAKE_C_FLAGS="/Z7" -DCMAKE_CXX_FLAGS="/Z7"' ...
-        ' -DCMAKE_SHARED_LINKER_FLAGS="/DEBUG"' ...
-        ' -DCMAKE_MODULE_LINKER_FLAGS="/DEBUG"'];
+        ' -DCMAKE_POLICY_DEFAULT_CMP0091=NEW'];
 elseif ismac
     % Match the mexopts' minimum-load version (oldest Apple-Silicon macOS) so
     % the static VTK archives don't out-version the MEX.
@@ -215,28 +199,6 @@ if ~isempty(missing)
         strjoin(missing, ', '));
 end
 
-% TEMPORARY DIAGNOSTIC (revert with the /Z7 flags above): keep the PDB for the
-% one MEX that fails to load on R2023a, so its static-init crash can be
-% symbolized from the shipped artifact. Only this one -- 29 PDBs would bloat
-% the bundle. Never fatal: the build must not fail over a diagnostic.
-if ispc
-    pdbName = 'vtkIntegrateAttributes.pdb';
-    dest = fullfile(matlabDir, pdbName);
-    if isfile(dest)
-        d = dir(dest);
-        fprintf('  [diag: %s already in MATLAB/ (%.1f MB)]\n', pdbName, d.bytes/1e6);
-    else
-        found = dir(fullfile(tbBuild, '**', pdbName));
-        if isempty(found)
-            fprintf('  [diag: %s not found under %s]\n', pdbName, tbBuild);
-        else
-            copyfile(fullfile(found(1).folder, found(1).name), dest);
-            fprintf('  [diag: copied %s (%.1f MB) from %s]\n', ...
-                pdbName, found(1).bytes/1e6, found(1).folder);
-        end
-    end
-end
-
 % ---- 5. Linux: normalize DT_NEEDED entries -------------------------------
 % CMake-linked MEX bake absolute paths to the build runner's libmex.so /
 % libmx.so into DT_NEEDED (MATLAB ships them without a DT_SONAME). Rewrite
@@ -273,68 +235,53 @@ fprintf('Built %d MEX files.\n', numel(expectedMex));
 fprintf('=== vtkToolbox MEX compilation complete ===\n');
 
 
-function patch_output_window_static_init(vtkSrc)
-%PATCH_OUTPUT_WINDOW_STATIC_INIT  Make vtkOutputWindow's statics order-safe.
+function patch_token_manager_lock(vtkSrc)
+%PATCH_TOKEN_MANAGER_LOCK  Fix the static-init-order crash in vtktoken.
 %
-% vtkOutputWindow.cxx declares two file-scope statics:
+% This is THE bug that kept vtkIntegrateAttributes.mexw64 from loading on
+% MATLAB R2023a. ThirdParty/token/vtktoken/token/Token.cxx has:
 %
-%   static std::mutex InstanceLock;
-%   static vtkSmartPointer<vtkOutputWindow> vtkOutputWindowGlobalInstance;
+%   static std::mutex s_managerLock;
+%   std::shared_ptr<Manager> Token::m_manager;
 %
-% vtkOutputWindow::GetInstance() locks InstanceLock, and a static initializer
-% elsewhere in the link calls GetInstance() -- so on some link orders the
-% mutex is locked BEFORE its own dynamic initializer has run. That is
-% undefined behavior; concretely the mutex is still zeroed .bss.
+%   Manager* Token::getManagerInternal() {
+%     if (!Token::m_manager) {                            // unlocked pre-check
+%       std::lock_guard<std::mutex> lock(s_managerLock);  // <-- locks here
+%       ...  Token::m_manager = std::make_shared<Manager>();
 %
-% MSVC's runtime is where it bites. 14.40+ tolerates a zero-initialized mutex
-% (that tolerance is what makes constexpr mutex constructors legal), but
-% 14.29 reads a null pointer out of it and faults. MATLAB loads MSVCP140.dll
-% from its own bin\win64 ahead of anything else, and R2023a -- the channel's
-% Windows floor -- bundles 14.29. Result: vtkIntegrateAttributes.mexw64 (the
-% only MEX linking VTK ParallelCore, whose init order trips this) failed to
-% load on every Windows build with "A dynamic link library (DLL)
-% initialization routine failed", while loading fine on R2026a (14.44).
-% Debugger-confirmed: access violation at MSVCP140!mtx_do_lock reading
-% address 0, under ucrtbase!initterm.
+% VTK constructs string tokens from static data at load time (the
+% vtkDG*::Sides / SidesOfSides arrays have dynamic initializers), so
+% getManagerInternal() runs during static initialization -- and on some link
+% orders it locks s_managerLock BEFORE that mutex's own initializer has run.
+% The mutex is then still zeroed .bss, which is undefined behavior.
 %
-% Fix: move both statics into function-local statics, which C++11 initializes
-% on first use, thread-safely, with no cross-translation-unit ordering
-% dependency. Same idiom VTK already uses in vtkInformationKeyLookup ("Using
-% a static function / variable here to ensure static initialization"). The
-% #defines keep all ~15 existing call sites in the file unchanged. Applied on
-% every platform: the UB is real everywhere, it just happens to be harmless
-% against glibc/libc++ where a zeroed pthread mutex is already valid.
+% MSVC 14.40+ tolerates a zero-initialized mutex (the tolerance that makes
+% constexpr mutex constructors legal), so this is invisible there. 14.29 reads
+% a null pointer out of it and faults -- and MATLAB loads MSVCP140.dll from its
+% own bin\win64 first, with R2023a (the channel's Windows floor) bundling
+% 14.29. Hence: fails on R2023a, loads fine on R2026a (14.44), with an access
+% violation at MSVCP140!mtx_do_lock under ucrtbase!initterm.
 %
-% Reported upstream; drop this when VTK ships a fix. Errors out rather than
-% silently no-op'ing if the expected text is gone, so a VTK version bump
-% cannot quietly lose the patch.
-file = fullfile(vtkSrc, 'Common', 'Core', 'vtkOutputWindow.cxx');
+% Fix: make the mutex a function-local static, which C++11 initializes on
+% first use with no cross-translation-unit ordering dependency. The #define
+% keeps the single lock site unchanged. Reported upstream.
+file = fullfile(vtkSrc, 'ThirdParty', 'token', 'vtktoken', 'token', 'Token.cxx');
 if ~isfile(file)
     error('patch: %s not found', file);
 end
-old = [ ...
-    'static std::mutex InstanceLock; // XXX(c++17): use a `shared_mutex`' newline ...
-    'static vtkSmartPointer<vtkOutputWindow> vtkOutputWindowGlobalInstance;'];
+old = 'static std::mutex s_managerLock;';
 new = [ ...
-    '// mip: function-local statics -- see patch_output_window_static_init' newline ...
-    'static std::mutex& vtkOutputWindowInstanceLockRef()' newline ...
+    '// mip: function-local static -- see patch_token_manager_lock' newline ...
+    'static std::mutex& s_managerLockRef()' newline ...
     '{' newline ...
-    '  static std::mutex mtx;' newline ...
-    '  return mtx;' newline ...
+    '  static std::mutex m;' newline ...
+    '  return m;' newline ...
     '}' newline ...
-    'static vtkSmartPointer<vtkOutputWindow>& vtkOutputWindowGlobalInstanceRef()' newline ...
-    '{' newline ...
-    '  static vtkSmartPointer<vtkOutputWindow> inst;' newline ...
-    '  return inst;' newline ...
-    '}' newline ...
-    '#define InstanceLock vtkOutputWindowInstanceLockRef()' newline ...
-    '#define vtkOutputWindowGlobalInstance vtkOutputWindowGlobalInstanceRef()'];
+    '#define s_managerLock s_managerLockRef()'];
 txt = fileread(file);
 if ~contains(txt, old)
-    error(['patch: vtkOutputWindow.cxx no longer contains the expected ' ...
-        'static declarations. VTK %s may have fixed or moved them -- ' ...
-        're-verify the static-init-order fix before dropping this patch.'], ...
-        vtkSrc);
+    error(['patch: Token.cxx no longer declares s_managerLock at file ' ...
+        'scope -- VTK may have fixed it; re-verify before dropping this.']);
 end
 txt = strrep(txt, old, new);
 fid = fopen(file, 'w');
@@ -343,7 +290,7 @@ if fid < 0
 end
 fwrite(fid, txt);
 fclose(fid);
-fprintf('  [patched vtkOutputWindow.cxx: static-init-order fix]\n');
+fprintf('  [patched Token.cxx: static-init-order fix (s_managerLock)]\n');
 end
 
 

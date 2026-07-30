@@ -4,25 +4,33 @@
 
 - `vtktoolbox@master`: fixed the `vtkIntegrateAttributes.mexw64` DLL-init
   failure that had made **every** Windows build fail since the package landed
-  (24 builds, 0 green) by patching a static-initialization-order bug in VTK.
-  `vtkOutputWindow.cxx` declares `static std::mutex InstanceLock` at file
-  scope; a static initializer elsewhere in the link calls
-  `vtkOutputWindow::GetInstance()`, which locks it before its own dynamic
-  initializer has run, so the mutex is still zeroed `.bss` — undefined
-  behavior. MSVC 14.40+ tolerates a zero-initialized mutex (the tolerance
-  that makes constexpr mutex constructors legal), but 14.29 reads a null out
-  of it and faults, and MATLAB loads `MSVCP140.dll` from its own `bin\win64`
-  first — R2023a, the channel's Windows floor, bundles 14.29. Only
-  `vtkIntegrateAttributes` links VTK ParallelCore, whose init order trips it.
-  Debugger-confirmed on a real R2023a install: access violation at
-  `MSVCP140!mtx_do_lock` reading address 0 under `ucrtbase!initterm`; the same
-  binary loads fine on R2026a (14.44). `compile.m` now rewrites those statics
-  into function-local statics (initialized on first use, no cross-TU ordering
-  dependency) — the idiom VTK itself uses in `vtkInformationKeyLookup` — and
-  errors out if the expected source text ever changes. Reported upstream.
-  Note this was **not** a toolset or `/MD`-vs-`/MT` issue: a `-T v142` build
-  (14.29 compiler) failed identically, which is what proved it was init order
-  rather than codegen; that pin is reverted here.
+  (24 builds, 0 green). Root cause is a static-initialization-order bug in
+  VTK's vendored `vtktoken`: `ThirdParty/token/vtktoken/token/Token.cxx`
+  declares `static std::mutex s_managerLock` at file scope, and
+  `Token::getManagerInternal()` locks it to lazily create the token manager.
+  VTK builds string tokens from static data at load time (the
+  `vtkDG*::Sides`/`SidesOfSides` arrays have dynamic initializers), so on some
+  link orders that lock happens before the mutex's own initializer has run,
+  while it is still zeroed `.bss` — undefined behavior. MSVC 14.40+ tolerates
+  a zero-initialized mutex (the tolerance that makes constexpr mutex
+  constructors legal); 14.29 reads a null out of it and faults. MATLAB loads
+  `MSVCP140.dll` from its own `bin\win64` first, and R2023a — the channel's
+  Windows floor — bundles 14.29, so it failed there while loading fine on
+  R2026a (14.44). Only `vtkIntegrateAttributes` links VTK ParallelCore, whose
+  link order trips it, which is why the other 28 MEX loaded. `compile.m` now
+  rewrites the mutex into a function-local static (initialized on first use,
+  no cross-translation-unit ordering dependency) and errors out if the
+  expected source text changes. Reported upstream.
+  Identified with a symbolized `/Z7` debug build: `cdb` put the access
+  violation at `MSVCP140!mtx_do_lock` under `ucrtbase!initterm`, and the
+  double-checked-lock shape (unlocked pointer pre-check, then lock, then a
+  312-byte `make_shared<Manager>`) matches `getManagerInternal` exactly. Two
+  earlier identifications made from the stripped binary's data layout were
+  wrong — `sizeof(std::mutex) == sizeof(std::recursive_mutex) == 80` on MSVC
+  x64, so layout alone does not discriminate. The `vtkOutputWindow.cxx` patch
+  from that attempt, and the `-T v142` toolset pin from an earlier one, are
+  both reverted: neither changed the failure, and there is no evidence
+  `vtkOutputWindow::GetInstance()` is reachable from static init at all.
 - `vtktoolbox@master`: dropped its per-package
   `_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR` CMake flag; mip_channel_tools'
   `build-package.yml` now sets it globally for every Windows build. Behavior
