@@ -1,0 +1,33 @@
+name: robotics-toolbox-matlab
+description: "Robotics Toolbox for MATLAB (Peter Corke): serial-link kinematics/dynamics, mobile-robot navigation and localization, path planners."
+version: "10.4"
+license: "LGPL-3.0-or-later"
+homepage: "https://petercorke.com/toolboxes/robotics-toolbox/"
+repository: "https://github.com/petercorke/robotics-toolbox-matlab"
+dependencies:
+  - spatialmath-matlab
+
+paths:
+  - path: "."
+  - path: "mex"
+  - path: "models"
+  - path: "data"
+  - path: "Apps"
+
+extra_paths:
+  examples:
+    - path: "demos"
+    - path: "examples"
+  simulink:
+    - path: "simulink"
+  vrep:
+    - path: "interfaces/VREP"
+  tests:
+    - path: "test"
+
+builds:
+  - architectures: [linux_x86_64, macos_x86_64, macos_arm64, windows_x86_64]
+    compile_script: compile.m
+    test_script: test_rtb_mex.m
+  - architectures: [any]
+    test_script: test_rtb.m

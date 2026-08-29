@@ -1,0 +1,4 @@
+source:
+  git: "https://github.com/petercorke/robotics-toolbox-matlab"
+  branch: "10.4"
+  remove_dirs: [doc]
