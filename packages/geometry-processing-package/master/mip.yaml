@@ -1,0 +1,24 @@
+name: geometry-processing-package
+description: "Triangle mesh processing toolbox (algebra, IO, parameterization, topology) from CUHK Computational Geometry Group."
+version: master
+license: "MIT"
+homepage: "https://github.com/cfwen/geometry-processing-package"
+repository: "https://github.com/cfwen/geometry-processing-package"
+dependencies: []
+
+paths:
+  - path: "."
+  - path: "algebra"
+  - path: "graphics"
+  - path: "io"
+  - path: "misc"
+  - path: "parameterization"
+  - path: "topology"
+
+extra_paths:
+  examples:
+    - path: "tutorial"
+
+builds:
+  - architectures: [any]
+    test_script: test_geometry_processing_package.m
